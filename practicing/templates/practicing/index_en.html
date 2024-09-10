@@ -1,0 +1,63 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+German speaking practice: list of situations
+{% endblock %} 
+
+{% block description %} 
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %} 
+
+{% block css_files %}
+<link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+{% block content %}
+  <section id="all-situations">
+      <h2>Speaking practice library</h2>
+      <table id="situations_list"></table>
+  </section>
+
+  <script>
+
+    $(document).ready( function () {
+      
+      var situations = [
+        {% for situation in situations %}
+          [ '{{situation.id}}', '{{ situation.topic }}', '{{ situation.about }}' ],
+        {% endfor %}
+      ]
+      
+      $('#situations_list').DataTable({
+        "data": situations,
+        "dom": '<"search"f><t><"bottom"rlp><"clear">',
+        "columns": [
+            {
+              title: '',
+              //width: '70px',
+              render: function(data, type, row) {
+                var item = '<a class="sutuation_link" href="/practicing/en/' + row[0] + '"> '
+                    item += '<div class="situation">'
+                    item +=   '<div class="situation_topic">' + row[1] + '</div>'
+                    item +=   '<div class="situation_about">' + row[2] + '</div>'
+                    item += '</div></a>'
+                return item
+              }
+            },
+        ],
+        "responsive": true
+      });
+
+    });
+
+  </script>
+{% endblock %}
+{% comment %} </body>
+</html> {% endcomment %}

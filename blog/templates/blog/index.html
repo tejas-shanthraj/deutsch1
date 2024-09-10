@@ -1,0 +1,86 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+Online Deutsch lernen mit Deutsch1 - effizient und einfach  
+{% endblock %} 
+
+{% block description %} 
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %} 
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "blog/post.css" %}" />
+  <link rel="stylesheet" href="{% static "blog/index.css" %}" />
+{% endblock %}
+
+{% block content %}
+
+<div id="row-kFNyvgCu" class="" style="background-color:rgb(255, 255, 255);background:linear-gradient(rgb(255, 255, 255),rgb(255, 255, 255)),">
+  <div class="container">
+     <div class="row">
+        <div class="col-md-6">
+           <div id="element-q5AW2DGx" class="spacing hidden-xs hidden-sm" style="height:40px"></div>
+           <div id="element-wAi4jsS9" class="editor" style="color:rgb(95, 179, 145);font-size:60px;line-height:1.2">
+              <div>
+                 <p><strong>How to learn German effectively</strong></p>
+              </div>
+           </div>
+           <div id="element-DWTkWnfn" class="spacing" style="height:15px"></div>
+           <div id="element-P6Qa6XAv" class="editor" style="color:rgb(77, 72, 74);font-size:20px">
+              <div>
+                 <p><strong>and benefit from my years of experience as a German teacher and telc examiner!</strong></p>
+                 <p><span style="text-decoration: underline;"><span style="color: #5fb391;"><strong>That's in it for you:</strong></span></span></p>
+              </div>
+           </div>
+           <div id="element-zWcFwaM7" class="list" style="font-size:16px;color:rgb(77, 72, 74)">
+              <ul class="fa-ul">
+                 <li><span class="fa-li"><i class="fa fa-check" style="margin-right:8px;color:rgb(95, 179, 145)"></i></span> <span>You will not only learn German for everyday life in my courses. You can also prepare for the next exam with them.</span></li>
+                 <li><span class="fa-li"><i class="fa fa-check" style="margin-right:8px;color:rgb(95, 179, 145)"></i></span> <span>You can benefit from my German tips that you probably never heard of in class.</span></li>
+                 <li><span class="fa-li"><i class="fa fa-check" style="margin-right:8px;color:rgb(95, 179, 145)"></i></span> <span>You can actively contact me and the community through comments, so you don't have to learn by yourself.</span></li>
+                 <li><span class="fa-li"><i class="fa fa-check" style="margin-right:8px;color:rgb(95, 179, 145)"></i></span> <span>You can also look forward to bonus material to help you learn German even more intensively and effectively!</span></li>
+              </ul>
+           </div>
+           <div id="element-ZXZXL77E" class="spacing" style="height:15px"></div>
+        </div>
+        <div class="col-md-6">
+           <div id="element-HpbzzmG3" class="image" style="text-align:center"><img src="{% static "/blog/images/dd6198113c70696cae99d620b9f7ace9.jpg" %}" style="width:600px"></div>
+        </div>
+     </div>
+  </div>
+</div>
+
+{% comment %} <section id="welcome">
+  <header>
+    <img src="{% static "blog/images/max.png" %}" alt="Max - The Author Of This Blog" />
+    <h2>Deutsch1 BLOG</h2>
+  </header>
+  <p>Hi, I am Max and I love to blog about tech and the world!</p>
+</section> {% endcomment %}
+
+<div class="container">
+  <div class="row">
+    <section id="latest-posts">
+      <h2>Our latest posts</h2>
+
+      <ul>
+        {% for post in posts %}
+          {% include "blog/includes/post.html" %}
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+
+{% comment %} <section id="about">
+  <h2>What I Do</h2>
+  <p>
+    I love programming, I love to help others and I enjoy exploring new
+    technologies in general!
+  </p>
+  <p>
+    My goal is to keep on growing as a developer - and if I could help you do
+    the same, I'd be very happy!
+  </p>
+</section> {% endcomment %}
+{% endblock %}

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width" />
+
+    <title>German speaking practice</title>
+    
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/chat.css" />
+  </head>
+
+  <body>
+    <h1>German speaking practice</h1>
+    <div id="speaking_situation">
+      <div class="exit_lesson"> <a href="{% url 'practice-en-topics-page' %}"> <i class="fa-solid fa-arrow-left"></i> Exit <a></div>
+      <div class="speaking_situation_title"> {{ situation.topic }}</div>
+        <div class="speaking_situation_about"><strong>About:</strong> <br>{{ situation.about }} </div>
+        <div class="speaking_situation_participants"><strong>Participants:</strong> <br>{{ situation.participants }} </div>
+        <div class="speaking_situation_role"><strong>Student's Role:</strong> <br>{{ situation.student_role }} </div>
+        <div class="speaking_situation_goal"><strong>Student's Goal:</strong> <br>{{ situation.student_goal }} </div>
+    </div>
+
+    <div id="speaking_body">
+      <div id="messages">
+        <div id="anchor"></div>
+      </div>
+    </div>
+
+    <div id="speaking_controls"> 
+      <div class="repeat_button"> <i class="fa-solid fa-repeat"></i> </div>
+      <div id="chosen_lang">de-DE</div>
+      <div class="mic_button"> <i class="fa-solid fa-microphone"></i> </div>
+      <div class="stop_button"> <i class="fa-solid fa-circle-stop"></i></i> </div>
+      <div id="answers_recognize_process"></div>
+      <div class="lesson_write_input"></div>
+    </div>
+
+    <p class="hints"></p>
+    <div id="conversation_id">
+    </div>
+
+    <div class="loader" style="display:none"></div>
+
+    {% comment %} <script src="/static/js/script.js"></script> {% endcomment %}
+    <script src="https://kit.fontawesome.com/7eb5b27e3b.js" crossorigin="anonymous"></script>
+    <script type='text/javascript'>
+
+      document.addEventListener("DOMContentLoaded", function() {
+
+        var situation_id = '{{ situation_id }}';
+        var loader = document.querySelector('.loader');
+        
+        {% comment %} loadInitial(situation_id); {% endcomment %}
+        
+        var diagnostic = document.querySelector('.output');
+        var bg = document.querySelector('html');
+        var hints = document.querySelector('.hints');
+        var mic_button = document.querySelector('.mic_button');
+        var stop_button = document.querySelector('.stop_button');
+        var recognize_progress = document.querySelector('#answers_recognize_process');
+        var repeat_button = document.querySelector('.repeat_button');
+        var chosen_lang = document.querySelector('#chosen_lang');
+        var recognized_text = 'placeholder';
+        var stop_recognition = false;
+
+        chosen_lang.onclick = function() {
+          var current_lang = chosen_lang.textContent;
+          
+          if (current_lang == 'de-DE') {
+            chosen_lang.textContent = '{{ lang }}';
+          } else {
+            chosen_lang.textContent = 'de-DE';
+          }
+        }
+
+        mic_button.onclick = function() {
+
+          var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+          var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+          var recognition = new SpeechRecognition();
+          // recognition.continuous = false;
+          recognition.continuous = true;
+          // recognition.lang = 'en-US';
+          // recognition.lang = 'ru-RU'; 
+          //recognition.lang = 'de-DE';
+          recognition.lang = chosen_lang.textContent;
+          // recognition.lang = '{{ lang }}';
+          // recognition.interimResults = false;
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+          // recognition.maxAlternatives = 4;
+
+          recognition.start();
+          console.log('Listening...');
+          mic_button.style.display = 'none';
+          stop_button.style.display = 'inline-block';
+
+          stop_button.onclick = function() {
+            recognition.stop();
+            console.log('Stopped...');
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+          }
+
+          repeat_button.onclick = function() {
+            stop_recognition = true;
+            recognition.stop();
+            console.log('Aborted...');
+            recognize_progress.textContent = '';
+          }
+
+          function capitalizeFirstLetter(string) {
+            let sentences = string.split('.');
+            let return_sentences = '';
+            for (i = 0; i < sentences.length; i++ ) {
+              if (sentences[i]) {
+                let sentence = sentences[i].trim()
+                return_sentences += sentence[0].toUpperCase() + sentence.slice(1) + '. '
+              }
+            }
+
+            return return_sentences;
+          }
+
+          recognition.onresult = function(event) {
+
+            if (stop_recognition == true) {
+              console.log('Aborted, do not try to recognize text');
+              recognized_text = 'placeholder';
+            } else {
+              let temp_text = '';
+              for (i = 0; i <= event.results.length; i++) {
+                transcript_string = String(event.results[i][0].transcript);
+                temp_text += transcript_string + '.';
+                capitalized_string = capitalizeFirstLetter(temp_text);
+                recognized_text = capitalized_string;
+                recognize_progress.textContent = recognized_text;
+              }
+            }
+          }
+
+          recognition.onspeechend = function() {
+            console.log("Sound has stopped being received onspeechend");
+            recognition.stop();
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+
+            if (stop_recognition != true) {
+              console.log('onspeechend text: ' + recognized_text);
+              recognize_progress.innerHTML = '<div class="dot-elastic"></div> Techer is answering ...';
+              sendRequest(recognized_text);
+            } else {
+              recognized_text = 'placeholder';
+              stop_recognition = false;
+              recognize_progress.textContent = '';
+            }
+
+          }
+
+          recognition.onnomatch = function(event) {
+            recognize_progress.textContent = "I didn't recognise this text...";
+          }
+
+          recognition.onerror = function(event) {
+            recognize_progress.textContent = event.error;
+          }
+
+          recognition.onsoundend = (event) => {
+              console.log('onsoundend text: ' + recognized_text);
+              console.log("Sound has stopped being received onsoundend");
+          };
+
+        }
+
+      });
+
+        function sendRequest(request) { 
+          var loader = document.querySelector('.loader');
+          var chat_body = document.querySelector('#messages');
+          var conversation_identificator = document.querySelector('#conversation_id');
+          loader.style.display = 'block';
+
+          const body = JSON.stringify({
+            "message": request,
+            "conv_id": conversation_identificator.textContent
+          }, undefined, 2);
+
+          console.log('With body like: ' + body);
+
+          fetch("{% url 'practice-en_speaking_request' %}", {
+            method: 'POST',
+            headers: {
+              "X-CSRFToken" : "{{ csrf_token }}",
+            },
+            body: body,
+          }).then(function(response){ 
+            return response.json()
+          }).then(function(data){
+            console.log('data: ');
+            console.log(data);
+
+            loader.style.display = 'none';
+
+            var recognize_progress = document.querySelector('#answers_recognize_process');
+            recognize_progress.innerHTML = '';
+
+            student_message = '';
+
+            // student_message += '<div class="message student_message">'
+            student_message +=   '<div class="message_role">Student</div>'
+            student_message +=   '<div class="message_content">'
+            student_message +=    request
+            student_message +=   '</div>'
+            // student_message +=  '</div>'
+
+            var stud_msg = document.createElement('div');
+            stud_msg.className = 'message student_message';
+            stud_msg.innerHTML = student_message
+
+            //chat_body.innerHTML += new_message;
+            var anchor = document.querySelector('#anchor');
+            chat_body.insertBefore(stud_msg, anchor);
+
+            {% comment %} chat_body.innerHTML += student_message; {% endcomment %}
+
+            if (data.new_message.includes('<correct_answer>')) {
+              correct_answer_text = data.new_message.substring(data.new_message.indexOf('<correct_answer>') + '<correct_answer>'.length, data.new_message.indexOf('</correct_answer>')).replaceAll('\n', '').replaceAll('"', '');
+            }
+
+            if (data.new_message.includes('<grammar>')) {
+              grammar_text = data.new_message.substring(data.new_message.indexOf('<grammar>') + '<grammar>'.length, data.new_message.indexOf('</grammar>')).replaceAll('\n', '').replaceAll('"', '');
+            }
+
+            if (data.new_message.includes('<conversational_partner_answer>')) {
+              conversational_partner_answer_text = data.new_message.substring(data.new_message.indexOf('<conversational_partner_answer>') + '<conversational_partner_answer>'.length, data.new_message.indexOf('</conversational_partner_answer>')).replaceAll('\n', '').replaceAll('"', '');
+            }
+
+            if (data.new_message.includes('<conversational_partner_answer_translation>')) {
+              conversational_partner_answer_translation_text = data.new_message.substring(data.new_message.indexOf('<conversational_partner_answer_translation>') + '<conversational_partner_answer_translation>'.length, data.new_message.indexOf('</conversational_partner_answer_translation>')).replaceAll('\n', '').replaceAll('"', '');
+            }
+
+            new_message = '';
+
+            //new_message += '<div class="message teacher_message">'
+            new_message +=   '<div class="message_role">Teacher</div>';
+            new_message +=     '<div class="message_content">';
+            
+            if (data.new_message.includes('<correct_answer>')) {
+              new_message +=       '<div class="correct_answer_text">';
+              new_message +=          '<div onclick="speakText(\'' + correct_answer_text.replaceAll("'", '').replaceAll('"', '') + '\')" class="play_sound"><i class="fa-solid fa-circle-play"></i></div>'
+              new_message +=          correct_answer_text;
+              new_message +=       '</div>';
+            }
+
+            if (data.new_message.includes('<grammar>')) {
+              new_message +=       '<div class="grammar_text">';
+              new_message +=          grammar_text;
+              new_message +=       '</div>';
+            }
+
+            if (data.new_message.includes('<conversational_partner_answer>')) {
+              new_message +=       '<div class="conversational_partner_answer_text">';
+              new_message +=          '<div onclick="speakText(\'' + conversational_partner_answer_text.replaceAll("'", '').replaceAll('"', '') + '\')" class="play_sound"><i class="fa-solid fa-circle-play"></i></div>'
+              new_message +=          conversational_partner_answer_text;
+              new_message +=       '</div>';
+            }
+
+            if (data.new_message.includes('<conversational_partner_answer_translation>')) {
+              new_message +=       '<div class="conversational_partner_answer_translation_text">';
+              new_message +=          '<div onclick="speakTextLang(\'' + conversational_partner_answer_translation_text.replaceAll("'", '').replaceAll('"', '') + '\')" class="play_sound"><i class="fa-solid fa-circle-play"></i></div>'
+              new_message +=          conversational_partner_answer_translation_text;
+              new_message +=       '</div>';
+            }
+
+            if ( !data.new_message.includes('<correct_answer>') && !data.new_message.includes('<grammar>') && !data.new_message.includes('<conversational_partner_answer>') && !data.new_message.includes('<conversational_partner_answer_translation>')) {
+              new_message +=       '<div class="conversational_partner_answer_translation_text">';
+              new_message +=          '<div onclick="speakTextLang(\'' + data.new_message.replaceAll('\n', '<br>').replaceAll("'", '').replaceAll('"', '') + '\')" class="play_sound"><i class="fa-solid fa-circle-play"></i></div>'
+              new_message +=          conversational_partner_answer_translation_text;
+              new_message +=       '</div>';
+            }
+            new_message +=     '</div>';
+            new_message +=    '</div>';
+            //new_message +=  '</div>'
+
+            var msg = document.createElement('div');
+            msg.className = 'message teacher_message';
+            msg.innerHTML = new_message
+
+            //chat_body.innerHTML += new_message;
+            var anchor = document.querySelector('#anchor');
+            chat_body.insertBefore(msg, anchor);
+
+            anchor.scrollIntoView(true);
+
+          }).catch(error => {
+            console.error('Error:', error)
+          }); 
+        
+        }
+
+        function loadInitial(situation_id) { 
+
+          var loader = document.querySelector('.loader');
+          var chat_body = document.querySelector('#messages');
+          var conversation_identificator = document.querySelector('#conversation_id')
+          loader.style.display = 'block';
+
+          fetch("{% url 'practice-en_speaking_starting_request' situation_id %}")
+            .then(function(response){ 
+              return response.json()
+            }).then(function(data){
+              console.log(data)
+              loader.style.display = 'none';
+              starting_message = '';
+
+              starting_message += '<div class="message teacher_message">'
+              starting_message +=   '<div class="message_role">Teacher</div>'
+              starting_message +=     '<div class="message_content">'
+              starting_message +=       data.starting_message
+              starting_message +=      '</div>'
+              starting_message +=    '</div>'
+              starting_message +=  '</div>'
+
+              var msg = document.createElement('div');
+              msg.className = 'message teacher_message';
+              msg.innerHTML = starting_message
+
+              //chat_body.innerHTML += new_message;
+              var anchor = document.querySelector('#anchor');
+              chat_body.insertBefore(msg, anchor);
+
+              {% comment %} chat_body.innerHTML += starting_message; {% endcomment %}
+              conversation_identificator.textContent = data.conv_id;
+
+            }).catch(error => {
+              console.error('Error:', error)
+            }); 
+            
+             speakTextLang('Welcome!')
+            // speakTextLang('Alles bereit? Gut! dann lass uns anfangen.')
+        
+        }
+
+        function speakText(text) {
+
+          if (text.length >= 200) {
+            var synth = window.speechSynthesis;
+            var voices = synth.getVoices();
+            console.log('The text is too long, requires splitting.');
+            var sentences = text.split('.');
+
+            sentences.forEach( (sentence) => {
+              var utterThis = new SpeechSynthesisUtterance(sentence);
+              utterThis.voice = voices[48]; // de voice
+              utterThis.pitch = 1;
+              utterThis.rate = 1;
+
+              synth.speak(utterThis);
+            });
+
+          } else {
+            var synth = window.speechSynthesis;
+            var voices = synth.getVoices();
+            var utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.voice = voices[48]; // de voice
+            utterThis.pitch = 1;
+            utterThis.rate = 0.9;
+
+            synth.speak(utterThis);
+          }
+
+        }
+
+        function speakTextLang(text) {
+
+          var speakingLang = '{{lang}}';
+
+          if (text.length >= 200) {
+            var synth = window.speechSynthesis;
+            var voices = synth.getVoices();
+            console.log('The text is too long, requires splitting.');
+            var sentences = text.split('.');
+
+            sentences.forEach( (sentence) => {
+              var utterThis = new SpeechSynthesisUtterance(sentence);
+              if (speakingLang == 'ru-RU') {
+                utterThis.voice = voices[63];
+              } else if (speakingLang == 'en-US') {
+                utterThis.voice = voices[49];
+              } else {
+                utterThis.voice = voices[48];
+              }
+              utterThis.pitch = 1;
+              utterThis.rate = 1;
+
+              synth.speak(utterThis);
+            });
+
+          } else {
+            var synth = window.speechSynthesis;
+            var voices = synth.getVoices();
+            var utterThis = new SpeechSynthesisUtterance(text);
+            if (speakingLang == 'ru-RU') {
+              utterThis.voice = voices[63];
+            } else if (speakingLang == 'en-US') {
+              utterThis.voice = voices[49];
+            } else {
+              utterThis.voice = voices[48];
+            }
+            utterThis.pitch = 1;
+            utterThis.rate = 1;
+
+            synth.speak(utterThis);
+          }
+
+        }
+
+      
+
+    </script>
+  </body>
+</html>

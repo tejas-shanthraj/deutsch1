@@ -1,0 +1,150 @@
+@import url(https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,500,600);
+
+html
+{
+    font-family: 'Muli', sans-serif !important;
+    font-weight: normal;
+    line-height: 1.5;
+
+    /* color: #6b6f82; */
+}
+
+.loader {
+  position: absolute;
+  width: 120px;
+  height: 90px;
+  margin: 0 auto;
+  top: 45%;
+  left: 45%;
+}
+
+.loader:before {
+  content: "";
+  position: absolute;
+  bottom: 30px;
+  left: 50px;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background: #2a9d8f;
+  animation: loading-bounce 0.5s ease-in-out infinite alternate;
+}
+
+.loader:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 7px;
+  width: 45px;
+  border-radius: 4px;
+  box-shadow: 0 5px 0 	#505050, -35px 50px 0 	#505050, -70px 95px 0 	#505050;
+  animation: loading-step 1s ease-in-out infinite;
+}
+
+@keyframes loading-bounce {
+  0% {
+    transform: scale(1, 0.7);
+  }
+
+  40% {
+    transform: scale(0.8, 1.2);
+  }
+
+  60% {
+    transform: scale(1, 1);
+  }
+
+  100% {
+    bottom: 140px;
+  }
+}
+
+@keyframes loading-step {
+  0% {
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0),
+            0 10px 0 #505050,
+            -35px 50px 0 #505050,
+            -70px 90px 0 #505050;
+  }
+
+  100% {
+    box-shadow: 0 10px 0 #505050,
+            -35px 50px 0 #505050,
+            -70px 90px 0 #505050,
+            -70px 90px 0 rgba(0, 0, 0, 0);
+  }
+}
+
+#all-situations h2 {
+  font-size: 28px;
+  font-weight: 400;
+  text-align: center;
+}
+
+table#situations_list {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border: none;
+}
+
+table.dataTable tbody tr {
+  background-color: transparent;
+  display: inline-block;
+  width: 48%;
+}
+
+a.sutuation_link {
+  text-decoration: none;
+  color: black;
+}
+
+a.sutuation_link:hover {
+  text-decoration: none;
+  background-color: #f4f4f4;
+}
+
+div.situation {
+  padding: 20px 20px;
+  border-radius: 10px;
+  border: 1px solid #DCDCDC;
+  height: 170px;
+  overflow: hidden;
+}
+
+div.situation:hover {
+  background-color: #f4f4f4;
+}
+
+.situation_topic {
+  padding: 10px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.situation_about {
+  padding: 10px;
+  line-height: 2;
+  font-weight: 300;
+}
+
+div#situations_list_filter {
+  width: 100%;
+  text-align: center;
+}
+
+#situations_list_filter label {
+  font-size: 18px;
+  padding: 10px;
+}
+
+#situations_list_filter input {
+  width: 80%;
+  height: 50px;
+  font-size: 18px;
+  margin-left: 15px;
+}
+
+#situations_list thead {
+  display: none;
+}

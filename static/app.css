@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  /* background-color:#f4f7fa; */
+  color:#000000;
+  font-size:14px;
+  line-height:1.4;
+  overflow-x:hidden;
+  /* margin: 0 5%; */
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Lato', sans-serif; 
+  font-weight: bold;
+}
+
+.container {
+  margin: 0 10%;
+}
+
+div#main-navigation {
+  margin: 0 10%;
+}
+
+.navigation__container {
+  display: flex;
+  align-items: center;
+}
+
+#main-navigation a {
+  text-decoration: none;
+}
+
+#main-navigation nav {
+  display: inline-block;
+  margin-left: auto;
+}
+
+#main-navigation ul {
+  background: darkorange;
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+}
+
+#main-navigation li {
+  color: #000;
+  /* background: darkorange; */
+  display: block;
+  float: left;
+  padding: 1rem 2rem;
+  position: relative;
+  text-decoration: none;
+  transition-duration: 0.5s;
+  font-weight: 800;
+}
+  
+#main-navigation li a {
+  color: #000;
+}
+
+#main-navigation li:hover,
+#main-navigation li:focus-within {
+	background: #f0f0f0;
+	cursor: pointer;
+}
+
+#main-navigation li:focus-within a {
+  outline: none;
+}
+
+#main-navigation ul li ul {
+	background: #f0f0f0;
+	visibility: hidden;
+  opacity: 0;
+  min-width: 5rem;
+	position: absolute;
+  transition: all 0.5s ease;
+  margin-top: 1rem;
+	left: 0;
+  display: none;
+}
+
+#main-navigation ul li:hover > ul,
+#main-navigation ul li:focus-within > ul,
+#main-navigation ul li ul:hover,
+#main-navigation ul li ul:focus {
+   visibility: visible;
+   opacity: 1;
+   display: block;
+}
+
+#main-navigation ul li ul li {
+	clear: both;
+  width: 100%;
+}
+
+.col-md-2-4 {
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  position: relative;
+}
+
+@media (min-width: 992px) {
+  .col-md-2-4 {
+      float: left;
+      width: 20%;
+  }
+}

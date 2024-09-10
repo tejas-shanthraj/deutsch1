@@ -1,0 +1,251 @@
+
+#speaking_situation {
+    width: 20%;
+    display: inline-block;
+    vertical-align: top;
+    line-height: 1.5;
+    font-size: 14px;
+    padding: 0 1.5% 0 0;
+}
+
+#speaking_situation a {
+  text-decoration: none; 
+  color: black;
+}
+
+.speaking_situation_about, 
+.speaking_situation_participants, 
+.speaking_situation_role,
+.speaking_situation_goal {
+    margin: 15px 0;
+}
+
+div.exit_lesson {
+    padding: 10px 20px;
+    background: #f1f1f1;
+    width: 80px;
+    border-radius: 5px;
+    margin: 20px 5px;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.speaking_situation_title {
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 10px 0;
+}
+
+#speaking_body {
+    width: 78%;
+    height: 600px;
+    overflow: scroll;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.repeat_button {
+    background-color: #DCDCDC;
+    display: inline-block;
+    padding: 30px;
+    vertical-align: middle;
+    border-radius: 10px;
+    font-size: 28px;
+    margin: 20px 0 20px 2%;
+}
+
+#chosen_lang {
+    display: inline-block;
+    padding: 40px 15px;
+    background-color: #DCDCDC;
+    border-radius: 10px;
+    margin-left: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.mic_button, .stop_button {
+    background-color: #DCDCDC;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 10px;
+    margin: 20px 0 20px 10px;
+}
+
+.mic_button {
+    font-size: 28px;
+    padding: 30px;
+}
+
+.stop_button {
+    font-size: 48px;
+    padding: 20px;
+}
+
+.stop_button {
+    display: none;
+}
+
+.mic_button:hover, 
+.repeat_button:hover, 
+.stop_button:hover, 
+#chosen_lang:hover {
+    background-color: grey;
+    color: white;
+    cursor: pointer;
+}
+
+div#answers_recognize_process {
+    width: 70%;
+    display: inline-block;
+    margin-left: 20px;
+    font-size: 18px;
+    font-weight: 200;
+    color: grey;
+    vertical-align: middle;
+}
+
+.message.teacher_message {
+    margin: 16px 8px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 10px;
+}
+
+.message_content {
+    font-weight: 200;
+    line-height: 1.6;
+}
+
+.message_role {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: grey;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.dot-elastic {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #DCDCDC;
+    color: #DCDCDC;
+    animation: dot-elastic 1s infinite linear;
+    display: inline-block;
+    margin: 0px 25px;
+  }
+  .dot-elastic::before, .dot-elastic::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 0;
+  }
+  .dot-elastic::before {
+    left: -15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #DCDCDC;
+    color: #DCDCDC;
+    animation: dot-elastic-before 1s infinite linear;
+  }
+  .dot-elastic::after {
+    left: 15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #DCDCDC;
+    color: #DCDCDC;
+    animation: dot-elastic-after 1s infinite linear;
+  }
+  
+  @keyframes dot-elastic-before {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1.5);
+    }
+    50% {
+      transform: scale(1, 0.67);
+    }
+    75% {
+      transform: scale(1, 1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  @keyframes dot-elastic {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1, 1.5);
+    }
+    75% {
+      transform: scale(1, 1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  @keyframes dot-elastic-after {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1, 0.67);
+    }
+    75% {
+      transform: scale(1, 1.5);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+#messages * {
+overflow-anchor: none;
+}
+
+#anchor {
+overflow-anchor: auto;
+height: 1px;
+}
+
+.grammar_text {
+    line-height: 2;
+    font-size: 17px;
+}
+
+.correct_answer_text, .conversational_partner_answer_text {
+    margin: 20px 0;
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.conversational_partner_answer_translation_text {
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.play_sound {
+    display: inline-block;
+    margin-right: 20px;
+    font-size: 33px;
+    color: #2a9d8f;
+    cursor: pointer;
+}
+
+.play_sound:hover {
+    color: #1f746a;
+}
