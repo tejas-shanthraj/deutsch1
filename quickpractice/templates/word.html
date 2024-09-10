@@ -17,6 +17,8 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 {% block js_files_head %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/cognitiveservices-speech-sdk/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
 {% endblock %}
 
 {% block content %}
@@ -52,6 +54,24 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+        const speechKey = "{{ speech_key }}";
+        const speechRegion = "{{ speech_region }}";
+
+        const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(speechKey, speechRegion);
+        speechConfig.speechRecognitionLanguage = "de-DE";
+        const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+        const speechRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+        const pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
+            "", // Reference text, set later
+            SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
+            SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
+            false // Disable miscue
+        );
+
+        pronunciationConfig.applyTo(speechRecognizer);
+
         let limit = Number("{{ limit }}");
         let offset = 0;
         let total = Number("{{ total }}");
@@ -73,7 +93,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 },
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 success: function(response) {
-                    console.log('response', response)
                     renderWords(response.data);
                     total = response.total;
                     updatePaginationInfo();
@@ -88,7 +107,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         }
 
         function renderWords(words) {
-            console.log(words);
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = '';
             words.forEach((item) => {
@@ -103,7 +121,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 wordTextDiv.className = 'word-text';
 
                 const wordText = document.createElement('span');
-                wordText.innerText = `${item.word.replace(/9999/g, "'")}`;
+                wordText.innerText = item.word.replace(/9999/g, "'");
 
                 const playButton = document.createElement('button');
                 playButton.className = 'play-button';
@@ -125,11 +143,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 stopButton.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
                 stopButton.style.display = 'none';
 
-                const refreshButton = document.createElement('button');
-                refreshButton.className = 'refresh-button';
-                refreshButton.id = `refresh-button-${item.id}`;
-                refreshButton.innerHTML = '<i class="fa-solid fa-repeat"></i>';
-
                 const feedbackDiv = document.createElement('div');
                 feedbackDiv.className = 'recognized-text';
                 feedbackDiv.id = `recognized-text-${item.id}`;
@@ -141,15 +154,13 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 resultDiv.id = `result-${item.id}`;
                 resultDiv.style.display = 'none';
 
-                micButton.addEventListener('click', () => startRecording(item.id, micButton, stopButton));
-                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, resultDiv, item.word.split(' ')));
-                refreshButton.addEventListener('click', () => resetRecording(item.id));
+                micButton.addEventListener('click', () => startRecording(item.id, item.word, micButton, stopButton, resultDiv));
+                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, resultDiv));
 
                 wordDiv.appendChild(breakline);
                 wordDiv.appendChild(wordTextDiv);
                 wordDiv.appendChild(micButton);
                 wordDiv.appendChild(stopButton);
-                wordDiv.appendChild(refreshButton);
                 wordDiv.appendChild(feedbackDiv);
                 wordDiv.appendChild(resultDiv);
 
@@ -191,8 +202,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         // Initial fetch of words
         fetchWords(limit, offset);
 
-        // Additional functionality like playSentence, togglePlayPause, startRecording, stopRecording, etc.
-
         let currentUtterance = null;
 
         function playWord(word, rate = 1) {
@@ -210,7 +219,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        function togglePlayPause(word, playButton, rate = 0.5) {
+        function togglePlayPause(word, playButton, rate = 1) {
             if ('speechSynthesis' in window) {
                 if (speechSynthesis.paused) {
                     speechSynthesis.resume();
@@ -231,107 +240,60 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        function startRecording(id, micButton, stopButton) {
-            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-            var recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.lang = 'de-DE';
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            recognition.onresult = function(event) {
-                let transcript = '';
-                for (var i = 0; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                var feedbackDiv = document.getElementById(`recognized-text-${id}`);
-                feedbackDiv.textContent = transcript;
-                feedbackDiv.style.display = 'block';
-            };
-
-            recognition.onerror = function(event) {
-                console.error(event.error);
-            };
-
-            recognition.start();
-            window.recognitionInstance = recognition;
+        function startRecording(id, word, micButton, stopButton, resultDiv) {
+            const recognizedTextDiv = document.getElementById(`recognized-text-${id}`);
 
             micButton.style.display = 'none';
             stopButton.style.display = 'inline-block';
+
+            recognizedTextDiv.style.display = 'none';
+            recognizedTextDiv.textContent = '';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            speechRecognizer.recognized = (s, e) => {
+                if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                    const recognizedText = e.result.text;
+                    recognizedTextDiv.textContent = recognizedText;
+
+                    pronunciationConfig.referenceText = word;
+                    pronunciationConfig.applyTo(speechRecognizer);
+
+                    const pronunciationAssessmentResult = SpeechSDK.PronunciationAssessmentResult.fromResult(e.result);
+                    const score = pronunciationAssessmentResult.pronunciationScore;
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `Your score: <strong>${score.toFixed(2)}</strong>`;
+
+                    // Highlighting recognized words based on correctness
+                    const recognizedWords = recognizedText.split(" ");
+                    const wordElements = word.split(" ").map(w => {
+                        if (recognizedWords.includes(w)) {
+                            return `<span class="correct">${w}</span>`;
+                        } else {
+                            return `<span class="incorrect">${w}</span>`;
+                        }
+                    }).join(" ");
+                    recognizedTextDiv.innerHTML = wordElements;
+                    recognizedTextDiv.style.display = 'block';
+                } else {
+                    recognizedTextDiv.textContent = 'Speech not recognized. Please try again.';
+                    recognizedTextDiv.style.display = 'block';
+                }
+            };
+
+            speechRecognizer.startContinuousRecognitionAsync();
         }
 
-        function stopRecording(id, stopButton, micButton, resultDiv, originalWords) {
-            if (window.recognitionInstance) {
-                window.recognitionInstance.stop();
-
+        function stopRecording(id, stopButton, micButton, resultDiv) {
+            speechRecognizer.stopContinuousRecognitionAsync(() => {
                 stopButton.style.display = 'none';
                 micButton.style.display = 'inline-block';
-
-                sendTranscriptToBackend(id, resultDiv, originalWords);
-            }
-        }
-
-        function resetRecording(id) {
-            var feedbackDiv = document.getElementById(`recognized-text-${id}`);
-            feedbackDiv.style.display = 'none';
-
-            var resultDiv = document.getElementById(`result-${id}`);
-            resultDiv.style.display = 'none';
-        }
-
-        function sendTranscriptToBackend(id, resultDiv, originalWords) {
-            var recordedTranscript = document.getElementById(`recognized-text-${id}`).textContent;
-
-            fetch('{% url "score" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    transcript: recordedTranscript,
-                    word_id: id,
-                    type: "word",
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                resultDiv.style.display = 'block';
-                if (data.correctness == 100) {
-                    resultDiv.innerHTML = `<p class="correct-word">Perfect Word!</p>`;
-                } else {
-                    let formattedResponse = '';
-                    let errorIndex = 0;
-                    for (let i = 0; i < originalWords.length; i++) {
-                        if (errorIndex < data.errors.length && originalWords[i].toLowerCase() === data.errors[errorIndex].original.toLowerCase()) {
-                            formattedResponse += `<span class="incorrect-word">${data.errors[errorIndex].recorded}</span> `;
-                            errorIndex++;
-                        } else {
-                            formattedResponse += `<span class="correct-word">${originalWords[i]}</span> `;
-                        }
-                    }
-                    resultDiv.innerHTML = `Correctness: ${data.correctness}%<p class="incorrect-word">${formattedResponse}</p>`;
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
+            }, (err) => {
+                console.error('Error stopping recording:', err);
             });
         }
 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
     });
 </script>
+
 {% endblock %}
