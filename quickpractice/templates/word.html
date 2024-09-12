@@ -54,28 +54,15 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-
         const speechKey = "{{ speech_key }}";
         const speechRegion = "{{ speech_region }}";
-
-        const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(speechKey, speechRegion);
-        speechConfig.speechRecognitionLanguage = "de-DE";
-        const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-        const speechRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-
-        const pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
-            "", // Reference text, set later
-            SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
-            SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
-            false // Disable miscue
-        );
-
-        pronunciationConfig.applyTo(speechRecognizer);
 
         let limit = Number("{{ limit }}");
         let offset = 0;
         let total = Number("{{ total }}");
-        let loading = false;  // Flag to prevent multiple AJAX calls
+        let speechRecognizer = null;  // Speech recognizer initialized dynamically
+        let isRecording = false;      // Flag to track if recording is active
+        let loading = false;
 
         updatePaginationInfo();
 
@@ -107,6 +94,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         }
 
         function renderWords(words) {
+            console.log(words)
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = '';
             words.forEach((item) => {
@@ -132,6 +120,9 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 wordTextDiv.appendChild(playButton);
                 wordTextDiv.appendChild(wordText);
 
+                // const micStopContainer = document.createElement('div');
+                // micStopContainer.className = 'mic-stop-container';
+
                 const micButton = document.createElement('button');
                 micButton.className = 'mic-button';
                 micButton.id = `mic-button-${item.id}`;
@@ -143,26 +134,37 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 stopButton.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
                 stopButton.style.display = 'none';
 
+                // micStopContainer.appendChild(micButton);
+                // micStopContainer.appendChild(stopButton);
+
+                const refreshButton = document.createElement('button');
+                refreshButton.className = 'refresh-button';
+                refreshButton.id = `refresh-button-${item.id}`;
+                refreshButton.innerHTML = '<i class="fa-solid fa-repeat"></i>';
+
                 const feedbackDiv = document.createElement('div');
                 feedbackDiv.className = 'recognized-text';
                 feedbackDiv.id = `recognized-text-${item.id}`;
                 feedbackDiv.style.display = 'none';
                 feedbackDiv.textContent = '';
 
-                const resultDiv = document.createElement('div');
-                resultDiv.className = 'result';
-                resultDiv.id = `result-${item.id}`;
-                resultDiv.style.display = 'none';
+                const confidenceDiv = document.createElement('div');
+                confidenceDiv.className = 'confidence-score';
+                confidenceDiv.id = `confidence-score-${item.id}`;
+                confidenceDiv.style.display = 'none';
+                confidenceDiv.textContent = '';
 
-                micButton.addEventListener('click', () => startRecording(item.id, item.word, micButton, stopButton, resultDiv));
-                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, resultDiv));
+                micButton.addEventListener('click', () => startRecording(item.id, item.word, micButton, stopButton, feedbackDiv, confidenceDiv));
+                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, feedbackDiv));
+                refreshButton.addEventListener('click', () => resetRecording(item.id));
 
                 wordDiv.appendChild(breakline);
                 wordDiv.appendChild(wordTextDiv);
                 wordDiv.appendChild(micButton);
                 wordDiv.appendChild(stopButton);
+                wordDiv.appendChild(refreshButton);
                 wordDiv.appendChild(feedbackDiv);
-                wordDiv.appendChild(resultDiv);
+                wordDiv.appendChild(confidenceDiv);
 
                 messagesDiv.appendChild(wordDiv);
             });
@@ -199,12 +201,11 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        // Initial fetch of words
         fetchWords(limit, offset);
 
         let currentUtterance = null;
 
-        function playWord(word, rate = 1) {
+        function playSentence(word, rate = 1) {
             if ('speechSynthesis' in window) {
                 if (currentUtterance && speechSynthesis.speaking) {
                     speechSynthesis.cancel();
@@ -219,7 +220,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        function togglePlayPause(word, playButton, rate = 1) {
+        function togglePlayPause(word, playButton, rate = 0.5) {
             if ('speechSynthesis' in window) {
                 if (speechSynthesis.paused) {
                     speechSynthesis.resume();
@@ -228,7 +229,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                     speechSynthesis.pause();
                     playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
                 } else {
-                    playWord(word, rate);
+                    playSentence(word, rate);
                     playButton.innerHTML = '<i class="fa-solid fa-pause"></i>';
                 }
 
@@ -240,60 +241,104 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        function startRecording(id, word, micButton, stopButton, resultDiv) {
-            const recognizedTextDiv = document.getElementById(`recognized-text-${id}`);
+        function startRecording(id, word, micButton, stopButton, feedbackDiv, confidenceDiv) {
+            // Prevent multiple recordings at the same time
+            if (isRecording) return;
 
             micButton.style.display = 'none';
             stopButton.style.display = 'inline-block';
 
-            recognizedTextDiv.style.display = 'none';
-            recognizedTextDiv.textContent = '';
-            resultDiv.style.display = 'none';
-            resultDiv.innerHTML = '';
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.textContent = '';
+            confidenceDiv.style.display = 'none';
+            confidenceDiv.textContent = '';
+
+            isRecording = true;
+
+            // Initialize a new SpeechRecognizer
+            const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(speechKey, speechRegion);
+            speechConfig.speechRecognitionLanguage = "de-DE";
+            const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+            console.log('AudioCOnfig ', audioConfig)
+            speechRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+            let pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
+                word, // Reference text
+                SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
+                SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
+                false // Disable miscue
+            );
+
+            
+            pronunciationConfig.applyTo(speechRecognizer);
 
             speechRecognizer.recognized = (s, e) => {
+                console.log('s ', s);
+                console.log('e ', e);
                 if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
                     const recognizedText = e.result.text;
-                    recognizedTextDiv.textContent = recognizedText;
+                    feedbackDiv.innerHTML = compareText(recognizedText, word);
+                    feedbackDiv.style.display = 'block';
 
-                    pronunciationConfig.referenceText = word;
-                    pronunciationConfig.applyTo(speechRecognizer);
-
-                    const pronunciationAssessmentResult = SpeechSDK.PronunciationAssessmentResult.fromResult(e.result);
-                    const score = pronunciationAssessmentResult.pronunciationScore;
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `Your score: <strong>${score.toFixed(2)}</strong>`;
-
-                    // Highlighting recognized words based on correctness
-                    const recognizedWords = recognizedText.split(" ");
-                    const wordElements = word.split(" ").map(w => {
-                        if (recognizedWords.includes(w)) {
-                            return `<span class="correct">${w}</span>`;
-                        } else {
-                            return `<span class="incorrect">${w}</span>`;
-                        }
-                    }).join(" ");
-                    recognizedTextDiv.innerHTML = wordElements;
-                    recognizedTextDiv.style.display = 'block';
-                } else {
-                    recognizedTextDiv.textContent = 'Speech not recognized. Please try again.';
-                    recognizedTextDiv.style.display = 'block';
+                    const pronunciationResult = SpeechSDK.PronunciationAssessmentResult.fromResult(e.result);
+                    console.log('pronunciationResult ', pronunciationResult);
+                    const score = pronunciationResult.pronunciationScore.toFixed(2);
+                    confidenceDiv.textContent = `Confidence Score: ${score}`;
+                    confidenceDiv.style.display = 'block';
                 }
             };
 
             speechRecognizer.startContinuousRecognitionAsync();
         }
 
-        function stopRecording(id, stopButton, micButton, resultDiv) {
-            speechRecognizer.stopContinuousRecognitionAsync(() => {
-                stopButton.style.display = 'none';
-                micButton.style.display = 'inline-block';
-            }, (err) => {
-                console.error('Error stopping recording:', err);
-            });
+        function stopRecording(id, stopButton, micButton, feedbackDiv) {
+            if (!isRecording || !speechRecognizer) return;
+
+            if (speechRecognizer) {
+                speechRecognizer.stopContinuousRecognitionAsync(() => {
+                    isRecording = false;
+                    stopButton.style.display = 'none';
+                    micButton.style.display = 'inline-block';
+                }, (err) => {
+                    console.error('Error stopping recording:', err);
+                });
+            }
         }
 
+        function resetRecording(id) {
+            const feedbackDiv = document.getElementById(`recognized-text-${id}`);
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.textContent = '';
+
+            const confidenceDiv = document.getElementById(`confidence-score-${id}`);
+            confidenceDiv.style.display = 'none';
+            confidenceDiv.textContent = '';
+
+            isRecording = false;
+
+            // Reset recognizer if needed
+            if (speechRecognizer) {
+                speechRecognizer.stopContinuousRecognitionAsync(() => {
+                    speechRecognizer.close();
+                    speechRecognizer = null;  // Clear the reference
+                });
+            }
+        }
+
+        function compareText(recognizedText, referenceText) {
+            const recognizedWords = recognizedText.split(' ');
+            console.log('recognizedWords ',recognizedWords);
+            const referenceWords = referenceText.split(' ');
+            console.log('referenceWords ',referenceWords);
+
+            return recognizedWords.map((word, index) => {
+                const referenceWord = referenceWords[index] || '';
+                console.log(word.replace(/[^a-zA-Z ]/g, "").toLowerCase());
+                console.log(referenceWord.replace(/[^a-zA-Z ]/g, "").toLowerCase());
+                const color = word.replace(/[^a-zA-Z ]/g, "").toLowerCase() === referenceWord.replace(/[^a-zA-Z ]/g, "").toLowerCase() ? 'green' : 'red';
+                return `<span style="color: ${color};">${word}</span>`;
+            }).join(' ');
+        }
     });
 </script>
-
 {% endblock %}

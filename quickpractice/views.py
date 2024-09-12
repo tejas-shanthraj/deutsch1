@@ -20,6 +20,8 @@ class SentenceStartPageView(View):
 
         fetch_sentences = get_sentence(limit, offset)
         context = {
+            'speech_key': os.getenv('SPEECH_KEY'),
+            "speech_region": os.getenv('SPEECH_REGION'),
             'total': fetch_sentences['total'],
             'remaining': fetch_sentences['remaining'],
             'limit': fetch_sentences['limit'],
