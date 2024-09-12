@@ -120,9 +120,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 wordTextDiv.appendChild(playButton);
                 wordTextDiv.appendChild(wordText);
 
-                // const micStopContainer = document.createElement('div');
-                // micStopContainer.className = 'mic-stop-container';
-
                 const micButton = document.createElement('button');
                 micButton.className = 'mic-button';
                 micButton.id = `mic-button-${item.id}`;
@@ -133,9 +130,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 stopButton.id = `stop-button-${item.id}`;
                 stopButton.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
                 stopButton.style.display = 'none';
-
-                // micStopContainer.appendChild(micButton);
-                // micStopContainer.appendChild(stopButton);
 
                 const refreshButton = document.createElement('button');
                 refreshButton.className = 'refresh-button';
@@ -201,7 +195,10 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
+        // Initial fetch of words
         fetchWords(limit, offset);
+
+        // Additional functionality like playSentence, togglePlayPause, startRecording, stopRecording, etc.
 
         let currentUtterance = null;
 
@@ -269,7 +266,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 false // Disable miscue
             );
 
-            
             pronunciationConfig.applyTo(speechRecognizer);
 
             speechRecognizer.recognized = (s, e) => {
