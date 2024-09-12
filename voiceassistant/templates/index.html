@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Quick Practice - German Sentences
+{% endblock %}
+
+{% block description %}
+Online Deutsch lernen - Practice German Sentences on the go!!!.
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css">
+<link rel="stylesheet" href="{% static 'css/quickpractice.css' %}">
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+{% block content %}
+<div id="main-div">
+    <h1>AI Voice Assistant️</h1>
+
+    <div id="sidebar">
+        <header>Select Scenario</header>
+        <div id="scenario-selection">
+            <input type="radio" id="wlan" name="scenario" value="WLAN Troubleshooting" checked>
+            <label for="wlan">WLAN Troubleshooting</label><br>
+            <input type="radio" id="hotel" name="scenario" value="Hotel Booking">
+            <label for="hotel">Hotel Booking</label>
+        </div>
+    </div>
+
+    <div id="chat-interface">
+        <div id="messages">
+            <div id="user-message"></div>
+            <div id="assistant-message"></div>
+        </div>
+
+        <div id="controls">
+            <button id="record-btn" class="control-btn">Start Recording</button>
+            <button id="stop-btn" class="control-btn" style="display:none;">Stop Recording</button>
+        </div>
+
+        <div id="loader" class="loader" style="display:none"></div>
+
+        <h2 id="conversation-end" style="display:none;">End of Conversation</h2>
+    </div>
+</div>
+{% endblock %}
