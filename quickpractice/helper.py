@@ -1,13 +1,12 @@
+import os
 import re
+import random
 import epitran
-# Model
 from .models import Sentences, Words
-
 from django.core.paginator import Paginator
+import azure.cognitiveservices.speech as speechsdk
 
 epi = epitran.Epitran('deu-Latn')
-
-import random
 
 # Practice pronouncing sentences
 def get_sentence( limit=5, offset=0):
@@ -82,7 +81,7 @@ def check_score(data):
         except Sentences.DoesNotExist:
             return {'error': 'Sentence not found', 'status': 404}
         
-        original_sentence = re.sub(r'[^\w\s]', '', db_data['sentence'])
+        original_sentence = db_data['sentence']
         original_ipa = db_data['ipa']
 
         recorded_ipa = epi.transliterate(data['transcript'])
@@ -103,7 +102,7 @@ def check_score(data):
         except Words.DoesNotExist:
             return {'error': 'Word not found', 'status': 404}
         
-        original_sentence = re.sub(r'[^\w\s]', '', db_data['word'])
+        original_sentence = db_data['word']
         original_ipa = db_data['ipa']
 
         recorded_ipa = epi.transliterate(data['transcript'])
@@ -120,10 +119,7 @@ def compare_phonetics(original_phonetic, recorded_phonetic, original_words, reco
     correct_phonetics = [i for i in original_phonetic.split() for j in recorded_phonetic.split() if i == j]
     incorrect_phonetics = list(set(original_phonetic.split()).difference(recorded_phonetic.split()))
 
-    original_words = list(map(str.lower, original_words))
-    recorded_words = list(map(str.lower, recorded_words))
-
-    correct_words = [i for i in original_words for j in recorded_words if i.lower() == j.lower()]
+    correct_words = [i for i in original_words for j in recorded_words if i == j]
     
     incorrect_words = list(set(original_words).difference(recorded_words))
     # Incorrect words set 1
@@ -158,3 +154,37 @@ def compare_phonetics(original_phonetic, recorded_phonetic, original_words, reco
     correctness = ((total_words - len(incorrect_words)) / total_words) * 100 if total_words > 0 else 0
     # print(f'\n\n\n Errors: {errors}')
     return {'correctness': round(correctness, 2), 'errors': errors}
+
+# def check_score1(data):
+#     print(data)
+#     # This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
+#     speech_config = speechsdk.SpeechConfig(subscription=os.environ.get('SPEECH_KEY'), region=os.environ.get('SPEECH_REGION'))
+#     speech_config.speech_recognition_language="de-DE"
+
+#     audio_config = speechsdk.audio.AudioConfig(use_default_microphone=False)
+#     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+#     pronunciationConfig = speechsdk.PronunciationAssessmentConfig(
+#         data['reference_text'], 
+#         speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+#         speechsdk.PronunciationAssessmentGranularity.Phoneme,
+#         False
+#     )
+#     pronunciationConfig.enable_prosody_assessment() 
+#     pronunciationConfig.enable_content_assessment_with_topic("greeting")
+    
+#     print(pronunciationConfig)
+
+#     print("Speak into your microphone.")
+#     speech_recognition_result = speech_recognizer.recognize_once_async().get()
+
+#     if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
+#         print("Recognized: {}".format(speech_recognition_result.text))
+#     elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
+#         print("No speech could be recognized: {}".format(speech_recognition_result.no_match_details))
+#     elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
+#         cancellation_details = speech_recognition_result.cancellation_details
+#         print("Speech Recognition canceled: {}".format(cancellation_details.reason))
+#         if cancellation_details.reason == speechsdk.CancellationReason.Error:
+#             print("Error details: {}".format(cancellation_details.error_details))
+#             print("Did you set the speech resource key and region values?")
