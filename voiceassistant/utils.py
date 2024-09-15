@@ -13,28 +13,40 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def record_audio_chunk(duration=5, sample_rate=16000, channels=1):
-    """Record audio for a given duration and save to a file."""
-    print("Aufnahme...")
-    audio_data = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels, dtype='int16')
-    sd.wait()  # Wait until recording is finished
+    try:
+        """Record audio for a given duration and save to a file."""
+        print("Aufnahme...")
+        audio_data = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels, device=1, dtype='int16')
+        sd.wait()
+        print("Recording completed!", audio_data)
 
-    temp_file_path = './temp_audio_chunk.wav'
-    print("Speichern...")
-    with wave.open(temp_file_path, 'wb') as wf:
-        wf.setnchannels(channels)
-        wf.setsampwidth(2)  # 16-bit audio
-        wf.setframerate(sample_rate)
-        wf.writeframes(audio_data.tobytes())
+        # Check the recorded data
+        if audio_data is not None:
+            print("Audio recorded successfully!")
+        else:
+            print("Failed to record audio.")
 
-    return temp_file_path
+        temp_file_path = './temp_audio_chunk.wav'
+        with wave.open(temp_file_path, 'wb') as wf:
+            wf.setnchannels(channels)
+            wf.setsampwidth(2)
+            wf.setframerate(sample_rate)
+            wf.writeframes(audio_data.tobytes())
+
+        return temp_file_path
+    except Exception as e:
+        print(f"Error during recording: {e}")
+        return None
 
 def transcribe_audio(model, file_path):
     """Transcribe audio file to text using Whisper model."""
     print("Transkribieren...")
     if os.path.isfile(file_path):
-        results = model.transcribe(file_path)
+        results = model.transcribe(file_path, language='de')
+        print(f"Results - {results['text']}")
         return results['text']
     else:
+        print("Audio file not found")
         return None
 
 def load_whisper():
@@ -127,4 +139,4 @@ def play_text_to_speech(text, language='de', slow=False):
         pygame.time.Clock().tick(10)
     pygame.mixer.music.stop()
     pygame.mixer.quit()
-    os.remove(temp_audio_file)
+    # os.remove(temp_audio_file)
