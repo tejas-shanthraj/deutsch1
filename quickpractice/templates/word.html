@@ -17,6 +17,8 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 {% block js_files_head %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/cognitiveservices-speech-sdk/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
 {% endblock %}
 
 {% block content %}
@@ -52,10 +54,15 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const speechKey = "{{ speech_key }}";
+        const speechRegion = "{{ speech_region }}";
+
         let limit = Number("{{ limit }}");
         let offset = 0;
         let total = Number("{{ total }}");
-        let loading = false;  // Flag to prevent multiple AJAX calls
+        let speechRecognizer = null;  // Speech recognizer initialized dynamically
+        let isRecording = false;      // Flag to track if recording is active
+        let loading = false;
 
         updatePaginationInfo();
 
@@ -73,7 +80,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 },
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 success: function(response) {
-                    console.log('response', response)
                     renderWords(response.data);
                     total = response.total;
                     updatePaginationInfo();
@@ -88,7 +94,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         }
 
         function renderWords(words) {
-            console.log(words);
+            console.log(words)
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = '';
             words.forEach((item) => {
@@ -103,7 +109,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 wordTextDiv.className = 'word-text';
 
                 const wordText = document.createElement('span');
-                wordText.innerText = `${item.word.replace(/9999/g, "'")}`;
+                wordText.innerText = item.word.replace(/9999/g, "'");
 
                 const playButton = document.createElement('button');
                 playButton.className = 'play-button';
@@ -136,13 +142,14 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 feedbackDiv.style.display = 'none';
                 feedbackDiv.textContent = '';
 
-                const resultDiv = document.createElement('div');
-                resultDiv.className = 'result';
-                resultDiv.id = `result-${item.id}`;
-                resultDiv.style.display = 'none';
+                const confidenceDiv = document.createElement('div');
+                confidenceDiv.className = 'confidence-score';
+                confidenceDiv.id = `confidence-score-${item.id}`;
+                confidenceDiv.style.display = 'none';
+                confidenceDiv.textContent = '';
 
-                micButton.addEventListener('click', () => startRecording(item.id, micButton, stopButton));
-                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, resultDiv, item.word.split(' ')));
+                micButton.addEventListener('click', () => startRecording(item.id, item.word, micButton, stopButton, feedbackDiv, confidenceDiv));
+                stopButton.addEventListener('click', () => stopRecording(item.id, stopButton, micButton, feedbackDiv));
                 refreshButton.addEventListener('click', () => resetRecording(item.id));
 
                 wordDiv.appendChild(breakline);
@@ -151,7 +158,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 wordDiv.appendChild(stopButton);
                 wordDiv.appendChild(refreshButton);
                 wordDiv.appendChild(feedbackDiv);
-                wordDiv.appendChild(resultDiv);
+                wordDiv.appendChild(confidenceDiv);
 
                 messagesDiv.appendChild(wordDiv);
             });
@@ -195,7 +202,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
         let currentUtterance = null;
 
-        function playWord(word, rate = 1) {
+        function playSentence(word, rate = 1) {
             if ('speechSynthesis' in window) {
                 if (currentUtterance && speechSynthesis.speaking) {
                     speechSynthesis.cancel();
@@ -219,7 +226,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                     speechSynthesis.pause();
                     playButton.innerHTML = '<i class="fa-solid fa-play"></i>';
                 } else {
-                    playWord(word, rate);
+                    playSentence(word, rate);
                     playButton.innerHTML = '<i class="fa-solid fa-pause"></i>';
                 }
 
@@ -231,106 +238,102 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             }
         }
 
-        function startRecording(id, micButton, stopButton) {
-            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-            var recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.lang = 'de-DE';
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            recognition.onresult = function(event) {
-                let transcript = '';
-                for (var i = 0; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                var feedbackDiv = document.getElementById(`recognized-text-${id}`);
-                feedbackDiv.textContent = transcript;
-                feedbackDiv.style.display = 'block';
-            };
-
-            recognition.onerror = function(event) {
-                console.error(event.error);
-            };
-
-            recognition.start();
-            window.recognitionInstance = recognition;
+        function startRecording(id, word, micButton, stopButton, feedbackDiv, confidenceDiv) {
+            // Prevent multiple recordings at the same time
+            if (isRecording) return;
 
             micButton.style.display = 'none';
             stopButton.style.display = 'inline-block';
+
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.textContent = '';
+            confidenceDiv.style.display = 'none';
+            confidenceDiv.textContent = '';
+
+            isRecording = true;
+
+            // Initialize a new SpeechRecognizer
+            const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(speechKey, speechRegion);
+            speechConfig.speechRecognitionLanguage = "de-DE";
+            const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+            console.log('AudioCOnfig ', audioConfig)
+            speechRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+            let pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
+                word, // Reference text
+                SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
+                SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
+                false // Disable miscue
+            );
+
+            pronunciationConfig.applyTo(speechRecognizer);
+
+            speechRecognizer.recognized = (s, e) => {
+                console.log('s ', s);
+                console.log('e ', e);
+                if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                    const recognizedText = e.result.text;
+                    feedbackDiv.innerHTML = compareText(recognizedText, word);
+                    feedbackDiv.style.display = 'block';
+
+                    const pronunciationResult = SpeechSDK.PronunciationAssessmentResult.fromResult(e.result);
+                    console.log('pronunciationResult ', pronunciationResult);
+                    const score = pronunciationResult.pronunciationScore.toFixed(2);
+                    confidenceDiv.textContent = `Confidence Score: ${score}`;
+                    confidenceDiv.style.display = 'block';
+                }
+            };
+
+            speechRecognizer.startContinuousRecognitionAsync();
         }
 
-        function stopRecording(id, stopButton, micButton, resultDiv, originalWords) {
-            if (window.recognitionInstance) {
-                window.recognitionInstance.stop();
+        function stopRecording(id, stopButton, micButton, feedbackDiv) {
+            if (!isRecording || !speechRecognizer) return;
 
-                stopButton.style.display = 'none';
-                micButton.style.display = 'inline-block';
-
-                sendTranscriptToBackend(id, resultDiv, originalWords);
+            if (speechRecognizer) {
+                speechRecognizer.stopContinuousRecognitionAsync(() => {
+                    isRecording = false;
+                    stopButton.style.display = 'none';
+                    micButton.style.display = 'inline-block';
+                }, (err) => {
+                    console.error('Error stopping recording:', err);
+                });
             }
         }
 
         function resetRecording(id) {
-            var feedbackDiv = document.getElementById(`recognized-text-${id}`);
+            const feedbackDiv = document.getElementById(`recognized-text-${id}`);
             feedbackDiv.style.display = 'none';
+            feedbackDiv.textContent = '';
 
-            var resultDiv = document.getElementById(`result-${id}`);
-            resultDiv.style.display = 'none';
-        }
+            const confidenceDiv = document.getElementById(`confidence-score-${id}`);
+            confidenceDiv.style.display = 'none';
+            confidenceDiv.textContent = '';
 
-        function sendTranscriptToBackend(id, resultDiv, originalWords) {
-            var recordedTranscript = document.getElementById(`recognized-text-${id}`).textContent;
+            isRecording = false;
 
-            fetch('{% url "score" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    transcript: recordedTranscript,
-                    word_id: id,
-                    type: "word",
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                resultDiv.style.display = 'block';
-                if (data.correctness == 100) {
-                    resultDiv.innerHTML = `<p class="correct-word">Perfect Word!</p>`;
-                } else {
-                    let formattedResponse = '';
-                    let errorIndex = 0;
-                    for (let i = 0; i < originalWords.length; i++) {
-                        if (errorIndex < data.errors.length && originalWords[i].toLowerCase() === data.errors[errorIndex].original.toLowerCase()) {
-                            formattedResponse += `<span class="incorrect-word">${data.errors[errorIndex].recorded}</span> `;
-                            errorIndex++;
-                        } else {
-                            formattedResponse += `<span class="correct-word">${originalWords[i]}</span> `;
-                        }
-                    }
-                    resultDiv.innerHTML = `Correctness: ${data.correctness}%<p class="incorrect-word">${formattedResponse}</p>`;
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
+            // Reset recognizer if needed
+            if (speechRecognizer) {
+                speechRecognizer.stopContinuousRecognitionAsync(() => {
+                    speechRecognizer.close();
+                    speechRecognizer = null;  // Clear the reference
+                });
             }
-            return cookieValue;
+        }
+
+        function compareText(recognizedText, referenceText) {
+            const recognizedWords = recognizedText.split(' ');
+            console.log('recognizedWords ',recognizedWords);
+            const referenceWords = referenceText.split(' ');
+            console.log('referenceWords ',referenceWords);
+
+            return recognizedWords.map((word, index) => {
+                const referenceWord = referenceWords[index] || '';
+                console.log(word.replace(/[^a-zA-Z ]/g, "").toLowerCase());
+                console.log(referenceWord.replace(/[^a-zA-Z ]/g, "").toLowerCase());
+                const color = word.replace(/[^a-zA-Z ]/g, "").toLowerCase() === referenceWord.replace(/[^a-zA-Z ]/g, "").toLowerCase() ? 'green' : 'red';
+                return `<span style="color: ${color};">${word}</span>`;
+            }).join(' ');
         }
     });
 </script>

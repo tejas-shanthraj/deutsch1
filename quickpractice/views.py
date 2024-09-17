@@ -1,9 +1,14 @@
+import os
 import json
 import logging
 from django.views import View
+from dotenv import load_dotenv
 from django.shortcuts import render
 from quickpractice.helper import get_sentence, check_score, get_word
 from django.http import JsonResponse, HttpResponse
+
+
+load_dotenv()
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -15,6 +20,8 @@ class SentenceStartPageView(View):
 
         fetch_sentences = get_sentence(limit, offset)
         context = {
+            'speech_key': os.getenv('SPEECH_KEY'),
+            "speech_region": os.getenv('SPEECH_REGION'),
             'total': fetch_sentences['total'],
             'remaining': fetch_sentences['remaining'],
             'limit': fetch_sentences['limit'],
@@ -40,6 +47,8 @@ class WordStartPageView(View):
 
         fetch_words = get_word(limit, offset)
         context = {
+            'speech_key': os.getenv('SPEECH_KEY'),
+            "speech_region": os.getenv('SPEECH_REGION'),
             'total': fetch_words['total'],
             'remaining': fetch_words['remaining'],
             'limit': fetch_words['limit'],
