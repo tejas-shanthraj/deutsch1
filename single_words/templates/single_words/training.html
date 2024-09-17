@@ -1,0 +1,60 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+German speaking practice: list of situations
+{% endblock %} 
+
+{% block description %} 
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %} 
+
+{% block css_files %}
+<link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+
+{% block content %}
+{% load static %}
+
+
+<form action="/single_words/word_pick" method="GET">
+    <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+    <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose different word</button>
+</form>
+<form action="/single_words/training" method="GET">
+    <input type="hidden" name="word_id" value="random" /> 
+    <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+    <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose random word</button>
+  </form>
+
+<div class="sw_container">
+    <div class="sw_flashcard">
+        <!-- Word and Image in the Flashcard -->
+        
+        <img src="{% static 'images/singlewords/' %}{{ image }}" alt="Flashcard Image">
+        <h2>{{ word }}</h2>        
+       
+        <p>Word ID: {{ word_id }}</p>
+
+        <form action="/single_words/training_solution" method="GET">
+            <input type="hidden" name="word_id" value="{{ word_id }}" /> 
+            <button type="submit" class="sw_btn_practice">Practice</button>
+        </form>
+        
+        
+    </div>
+
+
+</div>
+
+
+</body>
+</html>
+{% endblock %}
