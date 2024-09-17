@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'speaking',
     'practicing',
     'quickpractice',
+    'voiceassistant',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,5 +132,5 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
-MEDIA_ROOT = BASE_DIR / "uploads"
-MEDIA_URL = "/files/"
+MEDIA_ROOT = BASE_DIR / "voiceassistant/media"
+MEDIA_URL = "/media/"

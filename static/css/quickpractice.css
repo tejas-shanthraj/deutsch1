@@ -209,3 +209,34 @@ h1 {
 .refresh-button:hover {
     background-color: #f0f0f0;
 }
+
+
+.mic-button-1 {
+    color: white;
+    background-color: rgb(95, 179, 145);
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.stop-button-1 {
+    color: white;
+    background-color: red;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.mic-button-1:disabled {
+    background-color: grey; /* Apply grey background for disabled mic button */
+    cursor: not-allowed;    /* Show not-allowed cursor */
+}
+
+.stop-button-1:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
