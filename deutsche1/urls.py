@@ -28,5 +28,6 @@ urlpatterns = [
     path("speaking/", include("speaking.urls")),
     path("practicing/", include("practicing.urls")),
     path("quickpractice/", include("quickpractice.urls")),
+    path("single_words/", include("single_words.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

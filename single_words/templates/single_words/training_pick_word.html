@@ -39,16 +39,17 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
   <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose different category</button>
 </form>
 
-
-<div class="iframe-container">
-  <iframe src="{{ info_video_url }}"></iframe>
-</div>
-
 <form action="/single_words/training" method="GET">
   <input type="hidden" name="word_id" value="random" /> 
   <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
   <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose random word</button>
 </form>
+
+<div class="iframe-container">
+  <iframe src="{{ info_video_url }}"></iframe>
+</div>
+
+
 
 
 

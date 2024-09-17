@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'speaking',
     'practicing',
     'quickpractice',
+    'single_words',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
