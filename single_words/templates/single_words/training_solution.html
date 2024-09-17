@@ -41,22 +41,25 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         background-color: #4caf50; /* Green color for the filled part */
         width: 0%; /* Start with 0% width, to be updated by Django template */
         line-height: 30px;
-        color: white;
+        color: black;
         text-align: center;
         border-radius: 25px;
         transition: width 0.4s ease; /* Smooth transition for width changes */
     }
 </style>
 
-<form action="/single_words/word_pick" method="GET">
-    <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-    <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose different word</button>
-</form>
-<form action="/single_words/training" method="GET">
-    <input type="hidden" name="word_id" value="random" /> 
-    <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-    <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose random word</button>
-  </form>
+<script>
+    function changeImage(form) {
+        // Get the image element by its ID
+        const img = form.querySelector('#mic-image');
+        
+        // Change the image source
+        img.src = "{% static 'images/singlewords/gerausche.png' %}"; // New image path
+        
+        // You can also disable the button or prevent multiple submissions if needed
+        // form.querySelector('button').disabled = true;
+    }
+</script>
 
 
 <div class="sw_container">
@@ -72,6 +75,27 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
             <div class="progress-bar" style="width: {{ accuracy_score }}%;">
                 {{ accuracy_score }}%
             </div>
+        </div>
+        <div class="sw_button_container">
+            <form action="/single_words/word_pick" method="GET">
+                <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+            <form action="/single_words/training_solution" method="GET" onsubmit="changeImage(this)">
+                <input type="hidden" name="word_id" value="{{ word_id }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img id="mic-image" src="{% static 'images/singlewords/' %}wiederholen.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+            <form action="/single_words/training" method="GET">
+                <input type="hidden" name="word_id" value="random" /> 
+                <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
         </div>
     </div>
 

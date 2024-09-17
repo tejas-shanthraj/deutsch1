@@ -182,9 +182,8 @@ div#situations_list_filter {
   display: flex;
 }
 
-.sw_btn_practice{
+.sw_btn_practice {
   margin-top: 20px;
-  width: 100%;
   background-color: #007bff;
   color: white;
   border: none;
@@ -195,16 +194,18 @@ div#situations_list_filter {
   transition: background-color 0.3s;
 }
 
+.sw_button_container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* Space between the buttons */
+}
+
+.sw_button_container form {
+  flex: 1; /* Ensures that the buttons take equal space */
+}
+
+
 .sw_btn_practice:hover {
   background-color: #0056b3;
 }
 
-.sw_btn_container {
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-}

@@ -92,27 +92,19 @@ class training_solution_view(View):
         image = SingleWordsSituation.objects.get(id = word_id).image
         sound_type = SingleWordsSituation.objects.get(id = word_id).sound_type
 
-        # eval = get_dummy_eval()
-        eval = recognize_from_microphone(reference_text = word)
-        eval = json.loads(eval)
-        
-        syllables_with_scores = []
-        for nbest in eval['NBest']:
-            for w in nbest['Words']:
-                for syllable in w['Syllables']:
-                    syllables_with_scores.append(
-                        syllable['PronunciationAssessment']['AccuracyScore']
-                    )
-
-        accuracy_score = eval['NBest'][0]["PronunciationAssessment"]["AccuracyScore"]
-        print(accuracy_score)
+        accuracy_score = 0
+        try:
+            eval = recognize_from_microphone(reference_text = word)
+            eval = json.loads(eval)
+            accuracy_score = eval['NBest'][0]["PronunciationAssessment"]["AccuracyScore"]        
+        except:
+            accuracy_score = 0
 
         
         context = {
             "word": word,
             "word_id": word_id,
             "image": image,
-            "syllables": syllables_with_scores,
             "accuracy_score": accuracy_score,
             "sound_type": sound_type,
         }

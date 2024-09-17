@@ -35,15 +35,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 </style>
 
 
-<form action="/single_words/overview" method="GET">
-  <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose different category</button>
-</form>
-
-<form action="/single_words/training" method="GET">
-  <input type="hidden" name="word_id" value="random" /> 
-  <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-  <button type="submit" class="sw_btn_practice" style="width: 250px;">Choose random word</button>
-</form>
 
 <div class="iframe-container">
   <iframe src="{{ info_video_url }}"></iframe>
@@ -56,6 +47,26 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
   <section id="all-situations">
       <h2>Single Word practice library</h2>
+
+      <div class="sw_button_container" style="margin: 20px;">
+        <form action="/single_words/overview" method="GET">
+            <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+            <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
+            </button>
+        </form>
+        <form action="/single_words/training" method="GET">
+            <input type="hidden" name="word_id" value="random" /> 
+            <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+            <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
+            </button>
+        </form>
+      </div>
+
+
+
+
       <table id="situations_list"></table>
   </section>
 
