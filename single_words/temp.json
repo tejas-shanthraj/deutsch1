@@ -1,0 +1,199 @@
+{
+    "Id": "f030619f29414edba2d0401bd41b54fa",
+    "RecognitionStatus": "Success",
+    "Offset": 10000000,
+    "Duration": 15100000,
+    "Channel": 0,
+    "DisplayText": "Handyladekabel.",
+    "SNR": 29.76628,
+    "NBest": [
+      {
+        "Confidence": 0.9716231,
+        "Lexical": "Handyladekabel",
+        "ITN": "Handyladekabel",
+        "MaskedITN": "handyladekabel",
+        "Display": "Handyladekabel.",
+        "PronunciationAssessment": {
+          "AccuracyScore": 95.0,
+          "FluencyScore": 100.0,
+          "CompletenessScore": 100.0,
+          "PronScore": 97.0
+        },
+        "Words": [
+          {
+            "Word": "Handyladekabel",
+            "Offset": 10000000,
+            "Duration": 15100000,
+            "PronunciationAssessment": {
+              "AccuracyScore": 95.0,
+              "ErrorType": "None"
+            },
+            "Syllables": [
+              {
+                "Syllable": "Han",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 98.0
+                },
+                "Offset": 10000000,
+                "Duration": 5100000
+              },
+              {
+                "Syllable": "dy",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 15200000,
+                "Duration": 1300000
+              },
+              {
+                "Syllable": "la",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 16600000,
+                "Duration": 2300000
+              },
+              {
+                "Syllable": "de",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 16.0
+                },
+                "Offset": 19000000,
+                "Duration": 900000
+              },
+              {
+                "Syllable": "ka",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 98.0
+                },
+                "Offset": 20000000,
+                "Duration": 2700000
+              },
+              {
+                "Syllable": "bel",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 22800000,
+                "Duration": 2300000
+              }
+            ],
+            "Phonemes": [
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 96.0
+                },
+                "Offset": 10000000,
+                "Duration": 2900000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 13000000,
+                "Duration": 900000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 14000000,
+                "Duration": 1100000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 15200000,
+                "Duration": 500000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 15800000,
+                "Duration": 700000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 16600000,
+                "Duration": 900000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 17600000,
+                "Duration": 1300000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 0.0
+                },
+                "Offset": 19000000,
+                "Duration": 300000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 26.0
+                },
+                "Offset": 19400000,
+                "Duration": 500000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 97.0
+                },
+                "Offset": 20000000,
+                "Duration": 1500000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 21600000,
+                "Duration": 1100000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 22800000,
+                "Duration": 700000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 23600000,
+                "Duration": 600000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 24300000,
+                "Duration": 800000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

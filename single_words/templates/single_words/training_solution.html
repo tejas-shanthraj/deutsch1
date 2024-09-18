@@ -1,0 +1,108 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+German speaking practice: list of situations
+{% endblock %} 
+
+{% block description %} 
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %} 
+
+{% block css_files %}
+<link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+
+{% block content %}
+{% load static %}
+
+<style>
+    /* Container for the progress bar */
+    .progress-container {
+        width: 100%;
+        background-color: #f3f3f3;
+        border-radius: 25px;
+        overflow: hidden;
+        position: relative;
+        height: 30px;
+        margin: 20px 0;
+    }
+
+    /* Progress bar itself */
+    .progress-bar {
+        height: 100%;
+        background-color: #4caf50; /* Green color for the filled part */
+        width: 0%; /* Start with 0% width, to be updated by Django template */
+        line-height: 30px;
+        color: black;
+        text-align: center;
+        border-radius: 25px;
+        transition: width 0.4s ease; /* Smooth transition for width changes */
+    }
+</style>
+
+<script>
+    function changeImage(form) {
+        // Get the image element by its ID
+        const img = form.querySelector('#mic-image');
+        
+        // Change the image source
+        img.src = "{% static 'images/singlewords/gerausche.png' %}"; // New image path
+        
+        // You can also disable the button or prevent multiple submissions if needed
+        // form.querySelector('button').disabled = true;
+    }
+</script>
+
+
+<div class="sw_container">
+    <div class="sw_flashcard">
+        <!-- Word and Image in the Flashcard -->
+        
+        <img src="{% static 'images/singlewords/' %}{{ image }}" alt="Flashcard Image">
+        <h2>{{ word }}</h2>        
+       
+
+        <div class="progress-container">
+            <!-- Dynamically set the width of the progress bar -->
+            <div class="progress-bar" style="width: {{ accuracy_score }}%;">
+                {{ accuracy_score }}%
+            </div>
+        </div>
+        <div class="sw_button_container">
+            <form action="/single_words/word_pick" method="GET">
+                <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+            <form action="/single_words/training_solution" method="GET" onsubmit="changeImage(this)">
+                <input type="hidden" name="word_id" value="{{ word_id }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img id="mic-image" src="{% static 'images/singlewords/' %}wiederholen.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+            <form action="/single_words/training" method="GET">
+                <input type="hidden" name="word_id" value="random" /> 
+                <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+                <button type="submit" class="sw_btn_practice" style="width: 100%;">
+                    <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+
+</body>
+</html>
+{% endblock %}
