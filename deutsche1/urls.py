@@ -25,8 +25,8 @@ admin.site.index_title = "Welcome to Deutsch1 Admin Portal"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("blog.urls")),
-    path("speaking/", include("speaking.urls")),
-    path("practicing/", include("practicing.urls")),
+    # path("speaking/", include("speaking.urls")),
+    # path("practicing/", include("practicing.urls")),
     path("quickpractice/", include("quickpractice.urls")),
     path("single_words/", include("single_words.urls")),
     path("voiceassistant/", include("voiceassistant.urls")),
