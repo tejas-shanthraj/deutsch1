@@ -182,9 +182,22 @@ div#situations_list_filter {
   display: flex;
 }
 
+.sw_btn_navigation {
+  margin-top: 20px;
+  background-color: #4ca380;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
 .sw_btn_practice {
   margin-top: 20px;
-  background-color: #007bff;
+  background-color: #4ca380;
   color: white;
   border: none;
   padding: 10px;
