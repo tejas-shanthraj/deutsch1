@@ -42,6 +42,8 @@ def transcribe_audio(model, file_path):
     """Transcribe audio file to text using Whisper model."""
     print("Transkribieren...")
     if os.path.isfile(file_path):
+        print(file_path)
+        print("asdlkfj...")
         results = model.transcribe(file_path, language='de')
         print(f"Results - {results['text']}")
         return results['text']
