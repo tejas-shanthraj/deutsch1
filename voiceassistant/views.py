@@ -9,6 +9,7 @@ from voiceassistant.utils import transcribe_audio, get_response_llm, load_whispe
 from dotenv import load_dotenv
 import tempfile
 from django.core.files.base import ContentFile
+from django.views.decorators.csrf import csrf_exempt
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,6 +30,7 @@ class VoiceAssistantStartPageView(View):
 from langdetect import detect, DetectorFactory
 from django.core.files.storage import default_storage
 
+@csrf_exempt
 def transcribe_audio_view(request):
     if request.method == 'POST':
         # Get scenario
@@ -41,9 +43,10 @@ def transcribe_audio_view(request):
         if not audio_file:
             return JsonResponse({'error': 'Audio file is required'}, status=400)
 
+
         # Save the file
         temp_file_name = 'temp_audio.wav'
-        temp_file_path = os.path.join(f'{ROOT_DIR}/media', temp_file_name)
+        temp_file_path = os.path.join(f'{ROOT_DIR}\media', temp_file_name)
 
         print(f'temp_file_path {temp_file_path} - os.path - {os.path.basename}')
 

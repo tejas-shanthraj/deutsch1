@@ -46,24 +46,25 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
 
   <section id="all-situations">
-      <h2>Single Word practice library</h2>
+      <h2>Choose a word to practice</h2>
 
       <div class="sw_button_container" style="margin: 20px;">
-        <form action="/single_words/overview" method="GET">
-            <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-            <button type="submit" class="sw_btn_practice" style="width: 100%;">
-                <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
-            </button>
-        </form>
-        <form action="/single_words/training" method="GET">
-            <input type="hidden" name="word_id" value="random" /> 
-            <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-            <button type="submit" class="sw_btn_practice" style="width: 100%;">
-                <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
-            </button>
-        </form>
+        <div class="sw_button_container" style="margin: 20px; width: 50%;" >
+          <form action="/single_words/overview" method="GET">
+              <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+              <button type="submit" class="sw_btn_navigation">
+                  <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
+              </button>
+          </form>
+          <form action="/single_words/training" method="GET">
+              <input type="hidden" name="word_id" value="random" /> 
+              <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+              <button type="submit" class="sw_btn_navigation">
+                  <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
+              </button>
+          </form>
+        </div>
       </div>
-
 
 
 
@@ -91,7 +92,6 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
                 var item = '<a class="sutuation_link" href="/single_words/training?word_id=' + row[0] + '"> '
                     item += '<div class="situation">'
                     item +=   '<div class="situation_topic">' + row[1] + '</div>'
-                    item +=   '<div class="situation_about">' + row[2] + '</div>'
                     item += '</div></a>'
                 return item
               }

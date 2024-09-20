@@ -8,10 +8,8 @@ from .models import SingleWordsSituation, SingleWordsVideos
 
 class single_word_pick_category(View):
     def get(self, request):
-        situations = SingleWordsSituation.objects.values('sound_type').distinct()
-
-        for s in situations:
-            print(s)
+        
+        situations = SingleWordsVideos.objects.all()
         
         context = {
             "situations": situations
@@ -28,10 +26,13 @@ class single_word_pick_word(View):
             response = redirect('/single_words/overview/')
             return response
         
-        situations = SingleWordsSituation.objects.filter(sound_type=sound_type)
         info_video_url = SingleWordsVideos.objects.filter(sound_type__iexact=sound_type)
-
+        sound_type_id = info_video_url[0].id
         info_video_url = info_video_url[0].url
+
+        situations = SingleWordsSituation.objects.filter(sound_type=sound_type_id)
+        
+        
         context = {
             "situations": situations,
             "sound_type": sound_type,
@@ -56,6 +57,9 @@ class training_view(View):
                 response = redirect('/single_words/overview/')
                 return response
 
+
+            info_video_url = SingleWordsVideos.objects.filter(sound_type__iexact=sound_type)
+            sound_type = info_video_url[0].id
             situations = list(SingleWordsSituation.objects.filter(sound_type=sound_type))
             situations = random.sample(situations, 1)
 
@@ -120,7 +124,7 @@ def recognize_from_microphone(reference_text):
     audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
-
+    
     pronunciation_assessment_config = speechsdk.PronunciationAssessmentConfig( 
         reference_text=reference_text, 
         grading_system=speechsdk.PronunciationAssessmentGradingSystem.HundredMark, 
@@ -132,12 +136,12 @@ def recognize_from_microphone(reference_text):
 
 
     # The pronunciation assessment result as a Speech SDK object
-    pronunciation_assessment_result = speechsdk.PronunciationAssessmentResult(speech_recognition_result)
-
+    # pronunciation_assessment_result = speechsdk.PronunciationAssessmentResult(speech_recognition_result)
     # The pronunciation assessment result as a JSON string
     pronunciation_assessment_result_json = speech_recognition_result.properties.get(speechsdk.PropertyId.SpeechServiceResponse_JsonResult)
 
 
+    print(pronunciation_assessment_result_json)
     # print(pronunciation_assessment_result)
     # print("\n---------\n")
     # print(pronunciation_assessment_result_json)
