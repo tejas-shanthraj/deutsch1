@@ -172,3 +172,4 @@ pyvenv.cfg
 .env
 dump.sql
 .idea*
+myNotes*
