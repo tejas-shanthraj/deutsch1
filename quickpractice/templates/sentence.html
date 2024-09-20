@@ -57,6 +57,14 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
         const speechKey = "{{ speech_key }}";
         const speechRegion = "{{ speech_region }}";
 
+        let recognition = new webkitSpeechRecognition();  // SpeechRecognition API
+
+        recognition.lang = 'de-DE';  // German language
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        let transcript = '';  // To store the transcript from speech recognition
+
         let limit = Number("{{ limit }}");
         let offset = 0;
         let total = Number("{{ total }}");
@@ -258,6 +266,18 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
             const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
             console.log('AudioCOnfig ', audioConfig)
             speechRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+            // Start speech recognition
+            recognition.start();
+            console.log('Speech recognition started');
+
+            recognition.onresult = function(event) {
+                transcript = event.results[0][0].transcript;
+                console.log('Transcript: ', transcript);  // Log transcript for testing
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error: ', event.error);
+            };
 
             let pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
                 sentence, // Reference Text

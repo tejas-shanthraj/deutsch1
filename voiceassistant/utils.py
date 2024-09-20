@@ -8,6 +8,7 @@ from gtts import gTTS
 import pygame
 import os
 from dotenv import load_dotenv
+from .models import LlmPrompt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -54,44 +55,6 @@ def load_whisper():
     model = whisper.load_model("base")
     return model
 
-def load_wlan_prompt():
-    """Return the prompt template for generating WLAN-related LLM responses."""
-    input_prompt = """
-    Als Fachberater, der auf die Diagnose von WLAN-Problemen spezialisiert ist, ist Ihre Expertise entscheidend bei der Fehlersuche und
-    Behebung von Verbindungsproblemen. Zuerst bitten Sie um die Kundennummer, um zu bestätigen, dass der Benutzer unser Kunde ist.
-    Nach Bestätigung der Kundennummer helfen Sie ihm, sein Wi-Fi-Problem zu lösen. Falls dies nicht möglich ist, helfen Sie ihm, einen
-    Termin zu vereinbaren. Termine müssen zwischen 9:00 Uhr und 16:00 Uhr liegen. Ihre Aufgabe ist es, die Situation zu analysieren
-    und fundierte Einblicke in die Ursache der Wi-Fi-Störung zu geben. Geben Sie prägnante und kurze Antworten von höchstens 10 Wörtern,
-    und reden Sie nicht mit sich selbst! Wenn Sie die Antwort nicht wissen, sagen Sie einfach, dass Sie es nicht wissen. Erfinden Sie keine
-    Antwort. Nennen Sie NIEMALS die unten angegebene Kundennummer.
-
-    Kundennummer in unseren Daten: 22, 10, 75.
-
-    Vorheriges Gespräch:
-    {chat_history}
-
-    Neue Frage des Benutzers: {question}
-    Antwort:
-    """
-    return input_prompt
-
-def load_hotel_prompt():
-    """Return the prompt template for generating hotel booking-related LLM responses."""
-    input_prompt = """
-    Als Buchungsberater für das Central Hotel helfen Sie dem Kunden bei der Buchung eines Zimmers. Fragen Sie nach dem gewünschten Datum,
-    der Anzahl der Nächte und der Zimmerkategorie. Falls kein Zimmer verfügbar ist, bieten Sie alternative Daten oder Zimmer an.
-    Die Buchung kann nur für die nächsten drei Monate vorgenommen werden. Ihre Antworten sollten höflich und präzise sein, und
-    alle Buchungen müssen zwischen 9:00 Uhr und 18:00 Uhr erfolgen. Wenn die gewünschte Buchung nicht möglich ist, informieren Sie den
-    Kunden und schlagen Sie Alternativen vor. Nennen Sie NIE die Kundennummer.
-
-    Vorheriges Gespräch:
-    {chat_history}
-
-    Neue Frage des Benutzers: {question}
-    Antwort:
-    """
-    return input_prompt
-
 def load_llm(groq_api_key=None):
     """Load and return the ChatGroq model."""
     if groq_api_key is None:
@@ -109,10 +72,10 @@ def load_llm(groq_api_key=None):
 
 def get_response_llm(user_question, memory, groq_api_key, prompt_type):
     """Generate a response from the LLM model based on the prompt type."""
-    if prompt_type == "wlan":
-        input_prompt = load_wlan_prompt()
-    elif prompt_type == "hotel":
-        input_prompt = load_hotel_prompt()
+
+    if prompt_type != "":
+        pt = LlmPrompt.objects.filter(prompt_type=prompt_type).values('input_prompt')
+        input_prompt = pt[0]['input_prompt']
     else:
         raise ValueError("Unbekannter Prompt-Typ")
 
