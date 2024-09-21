@@ -18,7 +18,8 @@ class SingleWordsSituation(models.Model):
     word = models.CharField(max_length=250)
     image = models.ImageField(storage=static_storage)  # Image upload
     sound_type = models.ForeignKey(SingleWordsVideos, on_delete=models.CASCADE, db_column='sound_type')
+    syllables = models.CharField(max_length=500, blank=False, null=True)
 
     def __str__(self):
-        return f"{self.word}, {self.image}, {self.sound_type}"
+        return f"{self.word}"
 

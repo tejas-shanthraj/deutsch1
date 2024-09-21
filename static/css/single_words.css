@@ -1,0 +1,136 @@
+hr {
+    height:2px;
+    border-width:0;
+    color:gray;
+    background-color:gray; 
+    width: 100%;
+}
+
+.sw_btn_navigation {
+    margin-top: 20px;
+    background-color: #4ca380;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+
+/* Flashcard */
+.sw_flashcard {
+    width: 300px;
+    height: 500px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+.sw_flashcard img {
+    max-width: 100%;
+    max-height: 150px;
+    margin-bottom: 20px;
+}
+.sw_container {
+    justify-content: center;
+    align-items: center;
+    margin: 50px;
+    display: flex;
+}
+.sw_btn_practice {
+    margin-top: 20px;
+    background-color: #4ca380;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}  
+.sw_button_container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.sw_button_container form {
+    flex: 1; /* Ensures that the buttons take equal space */
+}
+  
+/* END Flashcard */
+
+/* Syllable Progress */
+.syllable-accuracy {
+    margin: 20px;
+    width: 100%;
+    margin: 20px 0;
+    margin-top: 0;
+}
+.syllable-list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; 
+    max-width: 100%;
+    margin-top: 0;
+}
+.syllable-name {
+    font-weight: bold;
+}
+.syllable-progress-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s ease;
+}
+.syllable-accuracy-score {
+    text-align: right;
+    margin-top: 5px;
+}
+.syllable-progress {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    height: 30px;
+    margin: 1px;
+}
+/* END Syllable Progress */
+
+/* Color Class Progress */
+.good {
+    background-color: #4caf50;
+}
+.ok {
+    background-color: #e7ff0e;
+}
+.bad {
+    background-color: #f53535;
+}
+/* END Color Class Progress */
+
+/* Total Progress */
+.progress-container-total {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 25px;
+    overflow: hidden;
+    position: relative;
+    height: 30px;
+    margin: 20px 0;
+    margin-top: 0;
+}
+.progress-bar-total {
+    height: 100%;
+    width: 0%; /* Start with 0% width, to be updated by Django template */
+    line-height: 30px;
+    color: black;
+    text-align: center;
+    border-radius: 25px;
+    transition: width 0.4s ease; /* Smooth transition for width changes */
+}
+/* END Total Progress */

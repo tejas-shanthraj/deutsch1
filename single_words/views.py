@@ -12,7 +12,6 @@ class single_word_pick_category(View):
         
         situations = SingleWordsVideos.objects.all()
         
-        for s in situations: print(s)
         context = {
             "situations": situations
         }
@@ -90,28 +89,50 @@ class training_solution_view(View):
         ID_NOT_SET_VALUE = "ID_NOT_SET"
         word_id = request.GET.get("word_id", ID_NOT_SET_VALUE)
 
-        # if word_id == ID_NOT_SET_VALUE:
-        #     response = redirect('/single_words/overview/')
-        #     return response
+        if word_id == ID_NOT_SET_VALUE:
+            response = redirect('/single_words/overview/')
+            return response
         
         word = SingleWordsSituation.objects.get(id = word_id).word
         image = SingleWordsSituation.objects.get(id = word_id).image
         sound_type = SingleWordsSituation.objects.get(id = word_id).sound_type
+        
 
-        accuracy_score = 0
+        total_accuracy_score = 0
         try:
             eval = recognize_from_microphone(reference_text = word)
             eval = json.loads(eval)
-            accuracy_score = eval['NBest'][0]["PronunciationAssessment"]["AccuracyScore"]        
-        except:
-            accuracy_score = 0
 
-        
+            total_accuracy_score = eval['NBest'][0]["PronunciationAssessment"]["AccuracyScore"] 
+            
+            syllable_scores = []
+            syllables = eval['NBest'][0]["Words"][0]["Syllables"] 
+            for syllable in syllables:
+                accuracy_score = syllable['PronunciationAssessment']['AccuracyScore']
+                syllable_scores.append(accuracy_score)
+        except:
+            total_accuracy_score = 0
+
+        # get syllables stored in db
+        syllables = str(SingleWordsSituation.objects.get(id = word_id).syllables)
+        syllables = syllables.split(",")
+        n_syllables = len(syllables)
+
+        # in case azure returns a different syllable count
+        syllables_difference = n_syllables -len(syllable_scores)
+        if syllables_difference > 0:
+            for i in range(syllables_difference):
+                syllable_scores.append(accuracy_score)
+
+        syllables_and_scores = zip(syllables, syllable_scores)    
+
         context = {
             "word": word,
             "word_id": word_id,
             "image": image,
-            "accuracy_score": accuracy_score,
+            "accuracy_score": total_accuracy_score,
+            "n_syllables": n_syllables,
+            "syllables_and_scores": syllables_and_scores,
             "sound_type": sound_type,
         }
 
@@ -137,23 +158,9 @@ def recognize_from_microphone(reference_text):
     speech_recognition_result = speech_recognizer.recognize_once()
 
 
-    # The pronunciation assessment result as a Speech SDK object
-    # pronunciation_assessment_result = speechsdk.PronunciationAssessmentResult(speech_recognition_result)
     # The pronunciation assessment result as a JSON string
     pronunciation_assessment_result_json = speech_recognition_result.properties.get(speechsdk.PropertyId.SpeechServiceResponse_JsonResult)
-
-
     print(pronunciation_assessment_result_json)
-    # print(pronunciation_assessment_result)
-    # print("\n---------\n")
-    # print(pronunciation_assessment_result_json)
-    # print("\n---------\n")
-    # print(pronunciation_assessment_result.accuracy_score)
-    # print(pronunciation_assessment_result.completeness_score)
-    # print(pronunciation_assessment_result.content_assessment_result)
-    # print(pronunciation_assessment_result.fluency_score)
-    # print(pronunciation_assessment_result.pronunciation_score)
-    # print(pronunciation_assessment_result.words)
 
     return pronunciation_assessment_result_json
 

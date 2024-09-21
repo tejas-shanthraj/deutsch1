@@ -11,6 +11,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
 {% block css_files %}
 <link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href={% static "css/single_words.css" %}/>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
 {% endblock %}
 
@@ -23,30 +24,7 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 {% block content %}
 {% load static %}
 
-<style>
-    /* Container for the progress bar */
-    .progress-container {
-        width: 100%;
-        background-color: #f3f3f3;
-        border-radius: 25px;
-        overflow: hidden;
-        position: relative;
-        height: 30px;
-        margin: 20px 0;
-    }
 
-    /* Progress bar itself */
-    .progress-bar {
-        height: 100%;
-        background-color: #4caf50; /* Green color for the filled part */
-        width: 0%; /* Start with 0% width, to be updated by Django template */
-        line-height: 30px;
-        color: black;
-        text-align: center;
-        border-radius: 25px;
-        transition: width 0.4s ease; /* Smooth transition for width changes */
-    }
-</style>
 
 <script>
     function changeImage(form) {
@@ -61,6 +39,15 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
     }
 </script>
 
+<style>
+    .syllable-item {
+        flex-basis: calc(100% / {{ n_syllables }}); /* Adjust based on how many items you want per row */
+        width: calc(100% / {{ n_syllables }});
+        margin: 10px 0; /* Add some vertical spacing */
+        text-align: center; /* Center the text in each item */
+    }    
+</style>
+
 
 <div class="sw_container">
     <div class="sw_flashcard">
@@ -68,14 +55,50 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         
         <img src="{% static 'images/singlewords/' %}{{ image }}" alt="Flashcard Image">
         <h2>{{ word }}</h2>        
-       
 
-        <div class="progress-container">
+        <hr>
+        Total Accuracy
+        <div class="progress-container-total">
             <!-- Dynamically set the width of the progress bar -->
-            <div class="progress-bar" style="width: {{ accuracy_score }}%;">
+            
+            <div class="progress-bar-total
+                        {% if accuracy_score >= 90 %}
+                        good
+                    {% elif accuracy_score >= 50 %}
+                        ok
+                    {% else %}
+                        bad
+                    {% endif %}"
+                    style="width: {{ accuracy_score }}%;">
                 {{ accuracy_score }}%
             </div>
         </div>
+
+
+        <div class="syllable-accuracy">
+            Syllable Accuracy
+            <div class="syllable-list">
+                {% for syllable, score in syllables_and_scores %}
+                    <div class="syllable-item">
+                        <div class="syllable-progress">
+                            <div class="syllable-progress-bar
+                                {% if score >= 70 %}
+                                    good
+                                {% elif score >= 30 %}
+                                    ok
+                                {% else %}
+                                    bad
+                                {% endif %}"
+                                style="width: 100%;">
+                                {{ syllable }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr>
         <div class="sw_button_container">
             <form action="/single_words/word_pick" method="GET">
                 <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
