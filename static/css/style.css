@@ -1,14 +1,25 @@
 @import url(https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,500,600);
 
-html
-{
-    font-family: 'Muli', sans-serif !important;
-    font-weight: normal;
-    line-height: 1.5;
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 
-    /* color: #6b6f82; */
+  font-family: 'Muli', sans-serif !important;
+  font-weight: normal;
+  line-height: 1.5;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-height {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 
 .loader {
