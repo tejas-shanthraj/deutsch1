@@ -26,42 +26,30 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
 
   <section id="all-situations">
       <h2>Choose a sound category to practice</h2>
-      <table id="situations_list"></table>
+      <div class="situation-container">
+        {% for situation in situations %}
+
+        <div class="situation-item">
+          <a class="situation_link" href="/single_words/word_pick?sound_type={{ situation.sound_type }}">
+            <div class="situation">
+              <div class="situation_topic">{{ situation.sound_type }}</div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+
+        <div class="situation-item">
+          <a class="situation_link" >
+            <div class="situation">
+              <div class="situation_topic">Coming soon ...</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      
   </section>
 
-  <script>
 
-  $(document).ready(function () {
-    
-    var situations = [
-      {% for situation in situations %}
-        [ '{{ situation.sound_type }}' ],
-      {% endfor %}
-    ];
-    
-    $('#situations_list').DataTable({
-      "data": situations,
-      "dom": '<"search"f><t><"bottom"rlp><"clear">',
-      "columns": [
-        {
-          title: '',
-          render: function(data, type, row) {
-            // Ensure that 'data' refers to the sound_type
-            var item = '<a class="sutuation_link" href="/single_words/word_pick?sound_type=' + data + '"> '
-                item += '<div class="situation">'
-                item +=   '<div class="situation_topic">' + data + '</div>'
-                item += '</div></a>';
-            return item;
-          }
-        }
-      ],
-      "responsive": true
-    });
-
-  });
-
-
-  </script>
 {% endblock %}
 {% comment %} </body>
 </html> {% endcomment %}

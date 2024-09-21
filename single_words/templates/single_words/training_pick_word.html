@@ -47,59 +47,50 @@ German speaking practice: Single Word practice
   <section id="all-situations">
       <h2>Choose a word to practice</h2>
 
-      <div class="sw_button_container" style="margin: 20px;">
-        <div class="sw_button_container" style="margin: 20px; width: 50%;" >
-          <form action="/single_words/overview" method="GET">
+
+        <div class="situation-container" >
+          <div class="situation-item-nav">
+            <form action="/single_words/overview" method="GET">
               <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
               <button type="submit" class="sw_btn_navigation">
                   <img src="{% static 'images/singlewords/' %}zuruck.png" style="height: 20px; margin: 0px;">
               </button>
-          </form>
-          <form action="/single_words/training" method="GET">
-              <input type="hidden" name="word_id" value="random" /> 
-              <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
-              <button type="submit" class="sw_btn_navigation">
-                  <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
-              </button>
-          </form>
+            </form>
+          </div>
+          <div class="situation-item-nav">
+            <form action="/single_words/training" method="GET">
+                <input type="hidden" name="word_id" value="random" /> 
+                <input type="hidden" name="sound_type" value="{{ sound_type }}" /> 
+                <button type="submit" class="sw_btn_navigation">
+                    <img src="{% static 'images/singlewords/' %}zufallig.png" style="height: 20px; margin: 0px;">
+                </button>
+            </form>
+          </div>  
+        </div>
+
+
+
+      <div class="situation-container">
+        
+        {% for situation in situations %}
+
+        <div class="situation-item">
+          <a class="situation_link" href="/single_words/training?word_id={{ situation.id }}">
+            <div class="situation">
+              <div class="situation_topic">{{ situation.word }}</div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+
+        <div class="situation-item">
+          <a class="situation_link" >
+            <div class="situation">
+              <div class="situation_topic">Coming soon ...</div>
+            </div>
+          </a>
         </div>
       </div>
-
-
-
-      <table id="situations_list"></table>
   </section>
 
-  <script>
-
-    $(document).ready( function () {
-      
-      var situations = [
-        {% for situation in situations %}
-          [ '{{situation.id}}', '{{ situation.word }}'],
-        {% endfor %}
-      ]
-      
-      $('#situations_list').DataTable({
-        "data": situations,
-        "dom": '<"search"f><t><"bottom"rlp><"clear">',
-        "columns": [
-            {
-              title: '',
-              //width: '70px',
-              render: function(data, type, row) {
-                var item = '<a class="sutuation_link" href="/single_words/training?word_id=' + row[0] + '"> '
-                    item += '<div class="situation">'
-                    item +=   '<div class="situation_topic">' + row[1] + '</div>'
-                    item += '</div></a>'
-                return item
-              }
-            },
-        ],
-        "responsive": true
-      });
-
-    });
-
-  </script>
 {% endblock %}
