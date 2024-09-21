@@ -1,0 +1,33 @@
+/* style.css */
+.navbar {
+    background-color: #007bff;
+    padding-left: 10%;
+    padding-right: 10%;
+  }
+  
+  .nav-link {
+    color: black !important;
+    font-weight: bold;
+  }
+  
+  .navbar-brand {
+    font-weight: bold;
+    color: black !important;
+  }
+  
+  .navbar-toggler {
+    border: none;
+  }
+  
+  .dropdown-menu {
+    background-color: #5fb391;
+  }
+  
+  .dropdown-item {
+    color: black !important;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #0056b3;
+  }
+  

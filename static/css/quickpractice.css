@@ -1,3 +1,8 @@
+.modal {
+    position: relative;
+}
+
+
 /* General reset for the page */
 body, html {
     margin: 0;
@@ -46,41 +51,9 @@ body {
     cursor: not-allowed;
 }
 
-/* Ensure navigation spans full width */
-.navbar {
-    width: 100%;
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 0;
-}
 
-.navbar .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-/* Ensure footer spans full width and is fixed to the bottom */
-.footer {
-    width: 100%;
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
 
-.footer .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
 
 .content {
     flex: 1;

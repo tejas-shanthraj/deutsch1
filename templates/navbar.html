@@ -1,0 +1,54 @@
+<!-- navbar.html -->
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="/" class="navigation__logo-link">
+        <img src="{% static 'images/logo.png' %}" class="navigation__logo" style="height:45px">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://deutsch1.net/%C3%BCber-mich/">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://deutsch1.net/faq/">FAQ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/single_words/overview/">Single Words</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Quick Practice
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/quickpractice/sentences">Sentences</a>
+              <a class="dropdown-item" href="/quickpractice/words">Words</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/voiceassistant/ai/">Voice Assistant</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              All Courses
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="https://deutsch1.net/kurs-a1/">Kurs A1</a>
+              <a class="dropdown-item" href="https://deutsch1.net/kurs-a2/">Kurs A2</a>
+              <a class="dropdown-item" href="https://deutsch1.net/kurs-b1/">Kurs B1</a>
+              <a class="dropdown-item" href="https://deutsch1.net/kurs-b2/">Kurs B2</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="https://member.deutsch1.net/s/onlinegerman/sign_in">My Account</a>
+        </li>        
+      </ul>
+    </div>
+  </nav>
+  
+<!-- /navbar.html -->

@@ -3,173 +3,61 @@
 <!DOCTYPE html>
 <html lang="en" class="wf-material-n4-inactive wf-inactive">
    <head>
+      <title>{% block title %}{% endblock %}</title>
+
       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
       <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-      <title>{% block title %}{% endblock %}</title>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">      
       <meta name="description" content="{% block description %}{% endblock %}">
       <meta name="robots" content="noodp">
+
       <link rel="dns-prefetch" href="https://static.funnelcockpit.com/">
       <link rel="dns-prefetch" href="https://api.funnelcockpit.com/">
-      <link rel="icon" href="https://static.funnelcockpit.com/upload/iTXgirsusBPZyNo44/850943aa1ebce58caebc9ffaf8797ba4.png">
-      <meta property="og:image" content="https://static.funnelcockpit.com/upload/iTXgirsusBPZyNo44/febfe41dfa0a71dd846c62d0089b2c1f.jpg">
-      
+
       <link rel="stylesheet" href="{% static "app.css" %}">
 
+
+      <!-- NAVBAR -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+      <!-- /NAVBAR -->
+
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      
       {% block css_files %}{% endblock %}
+      
 
       {% block js_files_head %}{% endblock %}
 
 </head>
-<body >
+   <body >
+      {% include 'navbar.html' %}
+      
 
-    <div  class="" style="padding-bottom:0;background-color:rgb(95, 179, 145);background:linear-gradient(rgb(95, 179, 145),rgb(95, 179, 145)),">
-      <div class="container">
-          <div class="row">
-            <div class="col-md-12"></div>
-          </div>
-      </div>
-    </div>
-
-    <div id="main-navigation">
-      <div class="navigation__container">
-        <a href="/" class="navigation__logo-link"><img src="{% static "/images/logo.png" %}" class="navigation__logo" style="height:45px"></a>
+      {% comment %} <header id="main-navigation">
+         <h1><a href="{% url "starting-page" %}">Deutsch1</a></h1>
+         <nav>
+           <a href="{% url "read-later" %}">Stored Posts</a>
+           <a href="{% url "posts-page" %}">All Posts</a>
+         </nav>
+       </header> {% endcomment %}
 
 
-          <nav role="navigation">
-            <ul>
-              <li><a href="https://deutsch1.net/%C3%BCber-mich/">About me</a></li>
-              <li><a href="https://deutsch1.net/faq/">FAQ</a></li>
-              <li><a href="/single_words/overview/">Single Words</a></li>
-              <li><a href="#" aria-haspopup="true">Quick Practice</a>
-               <ul class="dropdown" aria-label="submenu">
-                 <li><a href="/quickpractice/sentences">Sentences</a></li>
-                 <li><a href="/quickpractice/words">Words</a></li>
-               </ul>
-               </li>
-              <!-- <li><a href="/quick-practice">Quick Practice</a></li> -->
-              <!-- <li><a href="/speaking/en/topics/">Speaking</a></li> -->
-              <!-- <li><a href="/practicing/en/topics/">Practicing</a></li> -->
-              <li><a href="/voiceassistant/ai/">Voice Assistant</a></li>
-              <li><a href="#" aria-haspopup="true">All Courses</a>
-                <ul class="dropdown" aria-label="submenu">
-                  <li><a href="https://deutsch1.net/kurs-a1/">Kurs A1</a></li>
-                  <li><a href="https://deutsch1.net/kurs-a2/">Kurs A2</a></li>
-                  <li><a href="https://deutsch1.net/kurs-b1/">Kurs B1</a></li>
-                  <li><a href="https://deutsch1.net/kurs-b2/">Kurs B2</a></li>
-                  <li><a href="https://deutsch1.net/kurs-premium/">Premium</a></li>
-                  <li><a href="https://deutsch1.net/aussprachekurs/">Aussprachekurs</a></li>
-                  <li><a href="https://deutsch1.net/grammatikkurs/">Grammatik Kurs</a></li>
-                  <li><a href="https://deutsch1.net/konversationskurs-isabelle/">B1/B2Konversationskurs</a></li>
-                  <li><a href="https://deutsch1.net/konversationskurs-mit-isabelle-c1/">C1 Konversationskurs</a></li>
-                </ul>
-              </li>
-              <li><a href="https://member.deutsch1.net/s/onlinegerman/sign_in"><i class="navigation__item-icon fa-fw material-icons mi-person"></i>My Account</a></li>
-              <li><a href="#">Shop</a>
-                <ul class="dropdown" aria-label="submenu" style="width:200px">
-                  <li><a href="https://www.amazon.de/exec/obidos/ASIN/3517303232/verlagsgruppe-21/" target="_blank">Buch</a></li>
-                  <li><a href="https://deutsch1.net/b1-sprachbausteine/" target="_blank">B1 Sprachbausteine</a></li>
-                  <li><a href="https://deutsch1.net/b2-sprachbausteine/" target="_blank">B2 Sprachbausteine</a></li>
-                </ul>
-              </li>
-            </ul>
-          </nav>
+      <!-- content-->
+   {% block content %}
+   {% endblock %}
+      <!-- /conetent -->
 
-        </div>    
-    </div>
-
-  {% comment %} <header id="main-navigation">
-    <h1><a href="{% url "starting-page" %}">Deutsch1</a></h1>
-    <nav>
-      <a href="{% url "read-later" %}">Stored Posts</a>
-      <a href="{% url "posts-page" %}">All Posts</a>
-    </nav>
-  </header> {% endcomment %}
-
-  {% block content %}
-  {% endblock %}
-
-  <div class="" style="margin-top:15px;padding-bottom:15px;background-color:#13151c">
-    <div class="container">
+   {% include 'footer.html' %}
 
 
-      <div class="row">
-        <div class="col-md-2-4">
-          <div id="element-ZtpKh63y" class="image" style="text-align:;margin-top:20px;margin-bottom:25px">
-            <img src="https://static.funnelcockpit.com/upload/iTXgirsusBPZyNo44/9001aaa50a8d8e2575aaa1e665452776.png" style="width:111px">
-          </div>
-        </div>
-      </div>
+
+   {% block js_files_bottom %}{% endblock %}
 
 
-       <div class="row">
-          <div class="col-md-2-4">
-             <div id="element-s7m3tA2t" class="editor" style="color:#fff;line-height:2.2;font-size:16px">
-                <div>
-                   <p style="text-align: center;"><strong><span style="color: #5fb391;">PRESENT</span><br></strong><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://deutsch1.net/%C3%BCber-mich/"><strong>About me</strong></a></span><br><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://deutsch1.net/faq/"><strong>FAQ</strong></a></span><br><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://member.deutsch1.net/s/onlinegerman/sign_in"><strong>Login</strong></a></span></p>
-                </div>
-             </div>
-          </div>
-          <div class="col-md-2-4">
-             <div id="element-BtAidDwb" class="editor" style="color:#fff;line-height:2.2;font-size:16px">
-                <div>
-                   <p style="text-align: center;"><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://deutsch1.net/kurs-a1/"><strong>A1 Course</strong></a></span><br><strong>A2 Course</strong><br><strong>B1 Course</strong><br><strong>PREMIUM</strong></p>
-                </div>
-             </div>
-          </div>
-          <div class="col-md-2-4">
-             <div id="element-q8Z3XvyQ" class="editor" style="color:#fff;line-height:2.2;font-size:16px">
-                <div>
-                   <p style="text-align: center;"><strong>Future Courses</strong><br><strong>B2 Course</strong><br><strong>C1 Course</strong><br><strong>Crash Courses</strong></p>
-                </div>
-             </div>
-          </div>
-          <div class="col-md-2-4">
-             <div id="element-ajQrGDyP" class="editor" style="color:#fff;line-height:2.2;font-size:16px">
-                <div>
-                   <p style="text-align: center;"><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.tiktok.com/@deutsch_eins"><strong>TikTok</strong></a></span><br><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.instagram.com/deutsch_eins/"><strong>Instagram</strong></a></span><br><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.youtube.com/c/Deutsch1mitClara"><strong>YouTube</strong></a></span><br><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.facebook.com/Deutsch111"><strong>Facebook</strong></a></span></p>
-                </div>
-             </div>
-          </div>
-          <div class="col-md-2-4">
-             <div id="element-Jbe28qwJ" class="editor" style="color:#fff;line-height:2.2;font-size:16px">
-                <div>
-                   <p style="text-align: center;"><strong>info@deutsch1.net</strong><br></p>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
- </div>
- {% comment %} <div class="" style="padding-top:0;padding-bottom:0;background-color:#13151c">
-    <div class="container">
-       <div class="row">
-          <div class="col-md-12">
-             <div id="element-57B9j8cw" class="divider">
-                <div style="text-align:center;margin-left:auto;margin-right:auto;padding-top:0;padding-bottom:0;margin-top:20px;margin-bottom:20px;height:1px;background-color:transparent;min-height:1px;width:100%;font-size:0">
-                   <div style="margin-left:auto;margin-right:auto;padding-top:0;padding-bottom:0;margin-top:20px;margin-bottom:20px;height:1px;background-color:rgba(84, 84, 84, 0.67);min-height:1px;width:100%;display:inline-block;margin:0"></div>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
- </div> {% endcomment %}
- <div class="" style="padding-top:35px;padding-bottom:35px;background-color:#13151c">
-    <div class="container">
-       <div class="row">
-          <div class="col-md-12">
-             <div id="element-usbk4WoC" class="editor" style="color:#fff;font-size:15px">
-                <div>
-                   <p style="text-align: center;">© 2024 Deutsch1.net, All Right Reserved, Made by Clara with ❤️</p>
-                   <p style="text-align: center;"><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://deutsch1.net/impressum/"><span style="text-decoration: underline;">Impressum</span></a> - <a style="color: #ffffff;" href="https://deutsch1.net/datenschutz/"><span style="text-decoration: underline;">Datenschutzerklärung</span></a></span></p>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
- </div>
 
-{% block js_files_bottom %}{% endblock %}
-</body>
+   </body>
 </html>

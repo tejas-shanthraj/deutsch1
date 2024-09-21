@@ -6,11 +6,13 @@ import json
 
 from .models import SingleWordsSituation, SingleWordsVideos
 
+# /overview
 class single_word_pick_category(View):
     def get(self, request):
         
         situations = SingleWordsVideos.objects.all()
         
+        for s in situations: print(s)
         context = {
             "situations": situations
         }
