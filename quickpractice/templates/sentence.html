@@ -10,8 +10,8 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
 {% endblock %}
 
 {% block css_files %}
+<link rel="stylesheet" href={% static 'css/quickpractice.css' %}>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css">
-<link rel="stylesheet" href="{% static 'css/quickpractice.css' %}">
 {% endblock %}
 
 {% block js_files_head %}
@@ -32,7 +32,7 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
                 <div class="modal-header">
                     <a href="/" class="exit-link"><i class="fa-solid fa-arrow-left"></i> Exit</a>
                 </div>
-                <div id="modal-body">
+                <div id="modal-body" style="margin: auto;">
                     <div id="messages">
                         <div id="anchor"></div>
                     </div>
@@ -41,7 +41,7 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
                         <button id="prev-btn" class="pagination-btn" disabled><i class="fa-solid fa-arrow-left"></i></button>
                         <span id="page-info"></span>
                         <button id="next-btn" class="pagination-btn" disabled><i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
+                    </div><br />
                 </div>
             </div>
         </div>
