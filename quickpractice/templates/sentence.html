@@ -293,7 +293,7 @@ Online Deutsch lernen - Practice German Sentences on the go!!!.
                 console.log('e ', e);
                 if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
                     const recognizedText = e.result.text;
-                    feedbackDiv.innerHTML = compareText(recognizedText, sentence);
+                    feedbackDiv.innerHTML = compareText(transcript, sentence);
                     feedbackDiv.style.display = 'block';
 
                     const pronunciationResult = SpeechSDK.PronunciationAssessmentResult.fromResult(e.result);
