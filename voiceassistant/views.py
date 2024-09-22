@@ -46,7 +46,7 @@ def transcribe_audio_view(request):
 
         # Save the file
         temp_file_name = 'temp_audio.wav'
-        temp_file_path = os.path.join(f'{ROOT_DIR}\media', temp_file_name)
+        temp_file_path = os.path.join(f'{ROOT_DIR}/media', temp_file_name)
 
         print(f'temp_file_path {temp_file_path} - os.path - {os.path.basename}')
 
