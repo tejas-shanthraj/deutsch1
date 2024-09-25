@@ -3,70 +3,17 @@ from openai import OpenAI
 
 import time
 
-from .config import CHAT_GPT_API_KEY, CHAT_GPT_DEFAULT_MODEL, CHAT_GPT_ORG, ASSISTANT_ID_EN, ASSISTANT_ID_RU
+from tqdm import tqdm
+
+from .config import CHAT_GPT_API_KEY, CHAT_GPT_DEFAULT_MODEL, CHAT_GPT_ORG, ASSISTANT_ID_EN, CHAT_GPT_PROJECT, PERSONAL_KEY
 
 client = OpenAI(
-    api_key = CHAT_GPT_API_KEY,
-    organization = CHAT_GPT_ORG
+    api_key = PERSONAL_KEY
 )
 
-def GetStartingMessageRU(situation):
-
-    assistant_ru = client.beta.assistants.retrieve(ASSISTANT_ID_RU)
-    thread = client.beta.threads.create()
-
-    topic = situation.topic
-    about = situation.about
-    participants = situation.participants
-    student_role = situation.student_role
-    student_goal = situation.student_goal
-
-    conversational_situation = f'Тема: {topic} \n Ситуация: {about} \n Участники: {participants} \n Роль Студента: {student_role} \n Цель Студента: {student_goal} .'
-    
-    conv_id = thread.id
-    print('conversational_situation: ', conversational_situation)
-
-    message = client.beta.threads.messages.create(
-        thread_id = thread.id,
-        role = "user",
-        content = conversational_situation
-    )
-
-    run_create = client.beta.threads.runs.create(
-        thread_id = thread.id,
-        assistant_id = assistant_ru.id,
-        # instructions = instructions
-    )
-
-    completed = False
-    answer = ''
-
-    while not completed:
-        run_retrieve = client.beta.threads.runs.retrieve(
-            thread_id = thread.id,
-            run_id = run_create.id
-        )
-
-        print('run_retrieve.completed_at: ', run_retrieve.completed_at)
-
-        if run_retrieve.completed_at != None:
-            completed = True
-            messages = client.beta.threads.messages.list(
-                thread_id = thread.id
-            )
-            for message in messages.data:
-                if message.assistant_id == ASSISTANT_ID_RU:
-                    # print('message.content[0]', message.content[0].text)
-                    print('message.content[0].value', message.content[0].text.value)
-                    answer = message.content[0].text.value
-        else:
-            print('Run was not completed')
-            time.sleep(1)
-
-    return answer, conv_id
 
 def GetStartingMessageEN(situation):
-
+    print("start")
     assistant_en = client.beta.assistants.retrieve(ASSISTANT_ID_EN)
     thread = client.beta.threads.create()
 
@@ -87,12 +34,14 @@ def GetStartingMessageEN(situation):
         content = conversational_situation
     )
 
+    print("msg")
     run_create = client.beta.threads.runs.create(
         thread_id = thread.id,
         assistant_id = assistant_en.id,
         # instructions = instructions
     )
 
+    print("run create")
     completed = False
     answer = ''
 
@@ -102,7 +51,6 @@ def GetStartingMessageEN(situation):
             run_id = run_create.id
         )
 
-        print('run_retrieve.completed_at: ', run_retrieve.completed_at)
 
         if run_retrieve.completed_at != None:
             completed = True
@@ -114,61 +62,20 @@ def GetStartingMessageEN(situation):
                     # print('message.content[0]', message.content[0].text)
                     print('message.content[0].value', message.content[0].text.value)
                     answer = message.content[0].text.value
-        else:
-            print('Run was not completed')
-            time.sleep(1)
 
+        elif run_retrieve.status == "failed":
+            print("Run failed with msg: ", run_retrieve.last_error)
+            break
+
+        else:
+            WAIT_SECONDS = 1
+            print(f'Run was not completed. Waiting for {WAIT_SECONDS} seconds, before trying again')
+            for i in tqdm(range(WAIT_SECONDS)):                
+                time.sleep(1)
+
+    # answer = "Hallo, wie kann ich Ihnen helfen?"
+    # conv_id = "123"
     return answer, conv_id
-
-def GetTeacherResponseRU(message, conv_id):
-    print('in GetTeacherResponse message: ', message)
-    print('in GetTeacherResponse conv_id: ', conv_id)
-
-    user_answer = message
-    thread_id = conv_id
-
-    message = client.beta.threads.messages.create(
-        thread_id = thread_id,
-        role = "user",
-        content = user_answer
-    )
-
-    assistant_ru = client.beta.assistants.retrieve(ASSISTANT_ID_RU)
-
-    run_create = client.beta.threads.runs.create(
-        thread_id = thread_id,
-        assistant_id = assistant_ru.id,
-    )
-
-    completed = False
-    answer = ''
-
-    while not completed:
-        run_retrieve = client.beta.threads.runs.retrieve(
-            thread_id = thread_id,
-            run_id = run_create.id
-        )
-
-        print('run_retrieve.completed_at: ', run_retrieve.completed_at)
-
-        if run_retrieve.completed_at != None:
-            completed = True
-            messages = client.beta.threads.messages.list(
-                thread_id = thread_id
-            )
-            for message in messages.data:
-                if message.assistant_id == ASSISTANT_ID_RU:
-                    # print('message.content[0]', message.content[0].text)
-                    print('message.content[0].value', message.content[0].text.value)
-                    answer = message.content[0].text.value
-                    break
-        else:
-            print('Run was not completed')
-            time.sleep(1)
-
-
-    return answer
-
 
 def GetTeacherResponseEN(message, conv_id):
     print('in GetTeacherResponse message: ', message)
@@ -216,5 +123,9 @@ def GetTeacherResponseEN(message, conv_id):
             print('Run was not completed')
             time.sleep(1)
 
-
-    return answer
+    # answer = '''Guten Tag! Sie möchten zum Bahnhof? 
+    #     Um zum Bahnhof zu gelangen, gehen Sie bitte geradeaus bis zur Kreuzung. 
+    #     Dort biegen Sie rechts ab und gehen weiter geradeaus. 
+    #     Nach etwa 200 Metern sehen Sie den Bahnhof auf der linken Seite. 
+    #     Soll ich Ihnen noch etwas genauer erklären, wie Sie dorthin gelangen können?'''
+    return answer, conv_id

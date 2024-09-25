@@ -3,7 +3,6 @@ from django.db import models
 class SpeakingSituation(models.Model):
 
     LANG_CHOICES = {
-        ('ru-RU','Russian'),
         ('en-US','English')
     }
 

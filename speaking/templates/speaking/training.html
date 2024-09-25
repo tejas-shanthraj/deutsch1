@@ -1,0 +1,301 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %} 
+German speaking practice: list of situations
+{% endblock %} 
+
+{% block description %} 
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %} 
+
+{% block css_files %}
+<link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href={% static "css/chat.css" %}/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+
+{% block content %}
+{% load static %}
+
+<script src="https://kit.fontawesome.com/7eb5b27e3b.js" crossorigin="anonymous"></script>
+<script>
+  function toogle_info(){
+    console.log("toggke")
+    const element = document.getElementById("situation_info");
+    display = element.style.display;
+
+    if(display == "none"){
+      element.style.display = "block"
+    }else{
+      element.style.display = "none"
+    }
+  }
+</script>
+
+<div class="speaking_container">
+  <div style="width: 100%; text-align: center;">
+    <h1>German speaking practice</h1>
+  </div>
+
+  <div id="situation_info_wrapper">
+    <a href="{% url 'en-topics-page' %}">
+      <div class="situation_info_button">  
+        <i class="fa-solid fa-arrow-left"></i> Exit 
+      </div>
+    </a>
+    <button onclick="toogle_info()" class="situation_info_button">
+      <i class="fa-solid fa-info"></i> Info 
+    </button>
+
+    <div id="situation_info">
+      <div class="speaking_situation_title"> {{ situation.topic }}</div>
+      <div class="speaking_situation_about"><strong>About:</strong> <br>{{ situation.about }} </div>
+      <div class="speaking_situation_participants"><strong>Participants:</strong> <br>{{ situation.participants }} </div>
+      <div class="speaking_situation_role"><strong>Student's Role:</strong> <br>{{ situation.student_role }} </div>
+      <div class="speaking_situation_goal"><strong>Student's Goal:</strong> <br>{{ situation.student_goal }} </div>
+    </div>
+  </div>
+
+  <div id="speaking_body">
+    <div id="messages">
+      <div id="anchor"></div>
+    </div>
+  </div>
+
+
+  <div class="speaking_controls_wrapper">
+    <div id="mic_button" class="situation_control_button"> <i class="fa-solid fa-microphone"></i> </div>
+    <div id="stop_button" class="situation_control_button" style="display: none;"> <i class="fa-solid fa-circle-stop"></i></div>
+  </div>
+
+
+  <p style="visibility: hidden;" id="conv_id_element"></p>
+</div>
+
+
+
+    
+    <script type='text/javascript'>
+
+      document.addEventListener("DOMContentLoaded", function() {
+
+        var situation_id = '{{ situation_id }}';
+
+        loadInitial(situation_id);        
+
+        var mic_button = document.querySelector('#mic_button');
+        var stop_button = document.querySelector('#stop_button');
+
+        var recognized_text = 'placeholder';  
+
+        mic_button.onclick = function() {
+          var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+          var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+          var recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.lang = "de-DE";
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+
+          recognition.start();
+          console.log('Listening...');
+          mic_button.style.display = 'none';
+          stop_button.style.display = 'inline-block';
+
+          stop_button.onclick = function() {
+            recognition.stop();
+            console.log('Stopped...');
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+          }
+
+          function capitalizeFirstLetter(string) {
+            let sentences = string.split('.');
+            let return_sentences = '';
+            for (i = 0; i < sentences.length; i++ ) {
+              if (sentences[i]) {
+                let sentence = sentences[i].trim()
+                return_sentences += sentence[0].toUpperCase() + sentence.slice(1) + '. '
+              }
+            }
+
+            return return_sentences;
+          }
+
+          recognition.onresult = function(event) {
+            let temp_text = '';
+            for (i = 0; i <= event.results.length; i++) {
+              transcript_string = String(event.results[i][0].transcript);
+              temp_text += transcript_string + '.';
+              capitalized_string = capitalizeFirstLetter(temp_text);
+              recognized_text = capitalized_string;
+            }            
+          }
+
+          recognition.onspeechend = function() {
+            console.log("Sound has stopped being received onspeechend");
+            recognition.stop();
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+
+            console.log('onspeechend text: ' + recognized_text);
+            sendRequest(recognized_text);
+          }
+
+          
+
+          recognition.onsoundend = (event) => {
+            console.log('onsoundend text: ' + recognized_text);
+            console.log("Sound has stopped being received onsoundend");
+          };
+
+        }
+
+      });
+
+      function sendRequest(request) { 
+        var chat_body = document.querySelector('#messages');
+        var conv_id_element = document.querySelector('#conv_id_element');
+        var conv_id = conv_id_element.innerHTML;
+
+        const body = JSON.stringify({
+          "message": request,
+          "conv_id": conv_id
+        }, undefined, 2);
+
+        console.log('With body like: ' + body);
+
+        fetch("{% url 'en_speaking_request' %}", {
+          method: 'POST',
+          headers: {
+            "X-CSRFToken" : "{{ csrf_token }}",
+          },
+          body: body,
+        }).then(function(response){ 
+          return response.json()
+        }).then(function(data){        
+          student_message = '';
+
+
+          student_message +=   '<div class="message_role">Student</div>'
+          student_message +=   '<div class="message_content">'
+          student_message +=    request
+          student_message +=   '</div>'
+
+          var stud_msg = document.createElement('div');
+          stud_msg.className = 'message student_message';
+          stud_msg.innerHTML = student_message
+
+
+          var anchor = document.querySelector('#anchor');
+          chat_body.insertBefore(stud_msg, anchor);
+
+          console.log(data)
+          teacher_answer = data.new_message[0];
+          teacher_answer_clean = String(teacher_answer).replaceAll("'", '').replaceAll('"', '').replaceAll("\n", '')
+
+          new_message = '';
+          new_message +=   '<div class="message_role">Teacher</div>';
+          new_message +=     '<div class="message_content">';          
+          new_message +=       '<div class="correct_answer_text">';
+          new_message +=          '<div onclick="speakText(\'' + teacher_answer_clean + '\')" class="play_sound"><i class="fa-solid fa-circle-play"></i></div>'
+          new_message +=          teacher_answer;
+          new_message +=       '</div>';   
+          new_message +=     '</div>';
+          new_message +=    '</div>';
+
+          var msg = document.createElement('div');
+          msg.className = 'message teacher_message';
+          msg.innerHTML = new_message
+
+          var anchor = document.querySelector('#anchor');
+          chat_body.insertBefore(msg, anchor);
+
+          // anchor.scrollIntoView(true);
+
+        }).catch(error => {
+          console.error('Error:', error)
+        }); 
+      
+      }
+
+      function loadInitial(situation_id) { 
+
+        var chat_body = document.querySelector('#messages');
+        var conv_id_element = document.querySelector('#conv_id_element');
+
+        fetch("{% url 'en_speaking_starting_request' situation_id %}")
+          .then(function(response){ 
+            return response.json()
+          }).then(function(data){
+            console.log(data)
+            starting_message = '';
+
+            starting_message += '<div class="message teacher_message">'
+            starting_message +=   '<div class="message_role">Teacher</div>'
+            starting_message +=     '<div class="message_content">'
+            starting_message +=       data.starting_message
+            starting_message +=      '</div>'
+            starting_message +=    '</div>'
+            starting_message +=  '</div>'
+
+            var msg = document.createElement('div');
+            msg.className = 'message teacher_message';
+            msg.innerHTML = starting_message
+
+
+
+            //chat_body.innerHTML += new_message;
+            var anchor = document.querySelector('#anchor');
+            chat_body.insertBefore(msg, anchor);
+
+            conv_id_element.innerHTML = data.conv_id;
+
+          }).catch(error => {
+            console.error('Error:', error)
+          }); 
+          
+      
+      }
+
+      function speakText(text) {
+
+        if (text.length >= 200) {
+          var synth = window.speechSynthesis;
+          var voices = synth.getVoices();
+          console.log('The text is too long, requires splitting.');
+          var sentences = text.split('.');
+
+          sentences.forEach( (sentence) => {
+            var utterThis = new SpeechSynthesisUtterance(sentence);
+            utterThis.voice = voices[48]; // de voice
+            utterThis.pitch = 1;
+            utterThis.rate = 1;
+
+            synth.speak(utterThis);
+          });
+
+        } else {
+          var synth = window.speechSynthesis;
+          var voices = synth.getVoices();
+          var utterThis = new SpeechSynthesisUtterance(text);
+          utterThis.voice = voices[48]; // de voice
+          utterThis.pitch = 1;
+          utterThis.rate = 0.9;
+
+          synth.speak(utterThis);
+        }
+
+      }
+
+
+    </script>
+
+{% endblock %}

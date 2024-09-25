@@ -1,3 +1,66 @@
+.speaking_container {
+  margin-left:10%;
+  margin-right: 10%;
+  width: 80%;
+}
+#situation_info_wrapper {
+  width: 100%;
+  position: sticky;
+  top: 20px;
+}
+#situation_info_wrapper a {
+  text-decoration: none; 
+  color: black;
+}
+.situation_info_button {
+  padding: 10px 20px;
+  background: #f1f1f1;
+  width: 80px;
+  height: 80px;
+  border-radius: 5px;
+  border-color: transparent;
+  margin: 20px 5px;
+  font-weight: 600;
+  font-size: 20px;
+  float: left;
+}
+#situation_info{
+  width: 100%;
+  float: left;
+  display:none
+}
+
+#speaking_body {
+  width: 100%;
+  height: 600px;
+  overflow: scroll;
+  display: inline-block;
+  vertical-align: top;
+}
+
+
+.speaking_controls_wrapper{
+  width: max-content;
+  position: sticky;
+  bottom: 20px;
+  display:flex;
+  justify-content: flex-end;
+}
+
+.situation_control_button{
+  padding: 10px 20px;
+  background: #f1f1f1;
+  width: 80px;
+  height: 80px;
+  border-radius: 5px;
+  border-color: transparent;
+  margin: 20px 5px;
+  font-weight: 600;
+  font-size: 20px;
+  margin-left:auto;
+  vertical-align: middle;
+}
+
 
 #speaking_situation {
     width: 20%;
@@ -20,15 +83,7 @@
     margin: 15px 0;
 }
 
-div.exit_lesson {
-    padding: 10px 20px;
-    background: #f1f1f1;
-    width: 80px;
-    border-radius: 5px;
-    margin: 20px 5px;
-    font-weight: 600;
-    font-size: 20px;
-}
+
 
 .speaking_situation_title {
     font-weight: 600;
@@ -36,23 +91,8 @@ div.exit_lesson {
     margin: 10px 0;
 }
 
-#speaking_body {
-    width: 78%;
-    height: 600px;
-    overflow: scroll;
-    display: inline-block;
-    vertical-align: top;
-}
 
-.repeat_button {
-    background-color: #DCDCDC;
-    display: inline-block;
-    padding: 30px;
-    vertical-align: middle;
-    border-radius: 10px;
-    font-size: 28px;
-    margin: 20px 0 20px 2%;
-}
+
 
 #chosen_lang {
     display: inline-block;
@@ -64,46 +104,10 @@ div.exit_lesson {
     cursor: pointer;
 }
 
-.mic_button, .stop_button {
-    background-color: #DCDCDC;
-    display: inline-block;
-    vertical-align: middle;
-    border-radius: 10px;
-    margin: 20px 0 20px 10px;
-}
 
-.mic_button {
-    font-size: 28px;
-    padding: 30px;
-}
 
-.stop_button {
-    font-size: 48px;
-    padding: 20px;
-}
 
-.stop_button {
-    display: none;
-}
 
-.mic_button:hover, 
-.repeat_button:hover, 
-.stop_button:hover, 
-#chosen_lang:hover {
-    background-color: grey;
-    color: white;
-    cursor: pointer;
-}
-
-div#answers_recognize_process {
-    width: 70%;
-    display: inline-block;
-    margin-left: 20px;
-    font-size: 18px;
-    font-weight: 200;
-    color: grey;
-    vertical-align: middle;
-}
 
 .message.teacher_message {
     margin: 16px 8px;
