@@ -33,8 +33,13 @@ Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Allta
         // Change the image source
         img.src = "{% static 'images/singlewords/gerausche.png' %}"; // New image path
         
-        // You can also disable the button or prevent multiple submissions if needed
-        // form.querySelector('button').disabled = true;
+        
+        form.querySelector('button').disabled = true;
+
+        // After 2 seconds, change the image back to the original source
+        setTimeout(function() {
+            img.src = "{% static 'images/singlewords/loading-gif.gif' %}"; // New image path
+        }, 2000);
     }
 </script>
 
