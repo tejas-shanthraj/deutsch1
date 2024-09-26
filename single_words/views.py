@@ -99,6 +99,7 @@ class training_solution_view(View):
         
 
         total_accuracy_score = 0
+        syllable_scores = []
         try:
             eval = recognize_from_microphone(reference_text = word)
             eval = json.loads(eval)
@@ -112,6 +113,7 @@ class training_solution_view(View):
                 syllable_scores.append(accuracy_score)
         except:
             total_accuracy_score = 0
+            syllable_scores = [0]
 
         # get syllables stored in db
         syllables = str(SingleWordsSituation.objects.get(id = word_id).syllables)
