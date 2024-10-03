@@ -5,7 +5,7 @@ import time
 
 from tqdm import tqdm
 
-from .config import CHAT_GPT_API_KEY, CHAT_GPT_DEFAULT_MODEL, CHAT_GPT_ORG, ASSISTANT_ID_EN, CHAT_GPT_PROJECT, PERSONAL_KEY
+from .config import ASSISTANT_ID_EN, PERSONAL_KEY
 
 client = OpenAI(
     api_key = PERSONAL_KEY

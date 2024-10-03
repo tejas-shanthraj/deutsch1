@@ -253,3 +253,20 @@ height: 1px;
 .play_sound:hover {
     color: #1f746a;
 }
+
+
+.play_response_button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 14px;
+  margin: 4px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.play_response_button i {
+  margin-right: 5px;
+}

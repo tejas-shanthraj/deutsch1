@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+German practice: List of situations
+{% endblock %}
+
+{% block description %}
+Online Deutsch lernen ✓ über 250 Lektionen ✓ PDF-Arbeitsblättern ✓ Alltagsdialogen &amp; Quiz-Aufgaben für A1, A2, B1.
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href={% static "css/style.css" %}/>
+<link rel="stylesheet" href={% static "css/chat.css" %}/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+{% endblock %}
+
+{% block js_files_head %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+
+{% block content %}
+{% load static %}
+
+<script src="https://kit.fontawesome.com/7eb5b27e3b.js" crossorigin="anonymous"></script>
+
+<script>
+  function toggle_info(){
+    console.log("toggle");
+    const element = document.getElementById("situation_info");
+    let display = element.style.display;
+    if(display == "none"){
+      element.style.display = "block";
+    } else {
+      element.style.display = "none";
+    }
+  }
+</script>
+
+<div class="speaking_container">
+    <div style="width: 100%; text-align: center;">
+        <h1>German Practice</h1>
+    </div>
+
+    <div id="situation_info_wrapper" class="exit_lesson">
+        <a href="{% url 'practice-en-topics-page' %}">
+            <div class="situation_info_button">
+                <i class="fa-solid fa-arrow-left"></i> Exit 
+            </div>
+        </a>
+        <button onclick="toogle_info()" class="situation_info_button">
+            <i class="fa-solid fa-info"></i> Info 
+        </button>
+        
+        <div id="situation_info">
+            <div class="speaking_situation_title">{{ situation.topic }}</div>
+            <div class="speaking_situation_about"><strong>About:</strong> <br>{{ situation.about }}</div>
+            <div class="speaking_situation_participants"><strong>Participants:</strong> <br>{{ situation.participants }}</div>
+            <div class="speaking_situation_role"><strong>Student's Role:</strong> <br>{{ situation.student_role }}</div>
+            <div class="speaking_situation_goal"><strong>Student's Goal:</strong> <br>{{ situation.student_goal }}</div>
+        </div>
+    </div>
+
+    <div id="speaking_body">
+        <div id="messages">
+            <div id="anchor"></div>
+        </div>
+    </div>
+
+    <div id="speaking_controls" class="speaking_controls_wrapper"> 
+        <div id="mic_button" class="situation_control_button"> <i class="fa-solid fa-microphone"></i> </div>
+        <div id="stop_button" class="situation_control_button" style="display: none;"> <i class="fa-solid fa-circle-stop"></i></div>
+        <div id="answers_recognize_process"></div>
+        <div class="lesson_write_input"></div>
+    </div>
+
+    <p class="hints"></p>
+    <div id="conversation_id" style="display: none;"></div>
+    <div class="loader" style="display:none"></div>
+</div>
+
+<script type='text/javascript'>
+    document.addEventListener("DOMContentLoaded", function() {
+        var situation_id = '{{ situation_id }}';
+        var loader = document.querySelector('.loader');
+        var mic_button = document.querySelector('#mic_button');
+        var stop_button = document.querySelector('#stop_button');
+        var recognize_progress = document.querySelector('#answers_recognize_process');
+        var chosen_lang = 'de-DE';
+        var recognized_text = 'placeholder';
+        var stop_recognition = false;
+
+        // Disable the print dialog, if it's accidentally triggered
+        window.onbeforeprint = function() {
+            return false;  // Prevent the print dialog from appearing
+        };
+
+        // Set the language to German
+        var recognition_lang = 'de-DE';
+
+        var conversation_identificator = document.querySelector('#conversation_id');
+        // Load the initial situation and set conversation ID
+        loadInitial(situation_id);
+
+        mic_button.onclick = function() {
+          var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+          var recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.lang = 'de-DE';
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+
+          recognition.start();
+          console.log('Listening...');
+          mic_button.style.display = 'none';
+          stop_button.style.display = 'inline-block';
+
+          stop_button.onclick = function() {
+            recognition.stop();
+            console.log('Stopped...');
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+          }
+
+          recognition.onresult = function(event) {
+            if (stop_recognition) {
+              console.log('Aborted, do not try to recognize text');
+              recognized_text = 'placeholder';
+            } else {
+              let temp_text = '';
+              for (i = 0; i < event.results.length; i++) {
+                let transcript_string = String(event.results[i][0].transcript);
+                temp_text += transcript_string + '.';
+                recognized_text = temp_text.trim();
+                recognize_progress.textContent = recognized_text;
+              }
+            }
+          }
+
+          recognition.onspeechend = function() {
+            console.log("Stopped receiving sound...");
+            recognition.stop();
+            mic_button.style.display = 'inline-block';
+            stop_button.style.display = 'none';
+
+            if (!stop_recognition) {
+                recognize_progress.innerHTML = '<div class="dot-elastic"></div> Teacher is answering ...';
+                if (conversation_identificator && conversation_identificator.textContent.trim()) {
+                    sendRequest(recognized_text);
+                } else {
+                    console.error("Conversation ID is missing. Unable to send request.");
+                }
+            } else {
+              recognized_text = 'placeholder';
+              stop_recognition = false;
+              recognize_progress.textContent = '';
+            }
+          }
+
+          recognition.onnomatch = function(event) {
+            recognize_progress.textContent = "I didn't recognize this text...";
+          }
+
+          recognition.onerror = function(event) {
+            recognize_progress.textContent = event.error;
+          }
+        }
+    });
+
+    // Function to send the request
+    function sendRequest(request) { 
+        var loader = document.querySelector('.loader');
+        var chat_body = document.querySelector('#messages');
+        var conversation_identificator = document.querySelector('#conversation_id');
+        
+        // Check if the conversation ID is available
+        if (!conversation_identificator || !conversation_identificator.textContent.trim()) {
+            console.error("Conversation ID is missing. Aborting request.");
+            return;
+        }
+        
+        loader.style.display = 'block';
+
+        const body = JSON.stringify({
+            "message": request,
+            "conv_id": conversation_identificator.textContent.trim()  // Ensure conv_id is correctly passed
+        });
+        console.log('body ', body);
+
+        fetch("{% url 'practice-en_speaking_request' %}", {
+            method: 'POST',
+            headers: {
+            "X-CSRFToken" : "{{ csrf_token }}",
+            },
+            body: body,
+        }).then(function(response){ 
+            return response.json()
+        }).then(function(data){
+            console.log('data', data);
+            loader.style.display = 'none';
+            displayMessages(request, data);
+        }).catch(error => {
+            console.error('Error:', error)
+        }); 
+    }
+
+    // Load initial situation
+    function loadInitial(situation_id) { 
+        var loader = document.querySelector('.loader');
+        var chat_body = document.querySelector('#messages');
+        var conversation_identificator = document.querySelector('#conversation_id');
+        loader.style.display = 'block';
+
+        fetch("{% url 'practice-en_speaking_starting_request' situation_id %}")
+        .then(function(response){
+            return response.json()
+        }).then(function(data){
+            loader.style.display = 'none';
+            conversation_identificator.textContent = data.conv_id;  // Set conv_id from the response
+            console.log("Conversation ID set:", data.conv_id);
+
+            // Display starting message
+            var starting_message = `
+                <div class="message teacher_message">
+                <div class="message_role">Teacher</div>
+                <div class="message_content">${data.starting_message}</div>
+                </div>
+            `;
+
+            var msg = document.createElement('div');
+            msg.className = 'message teacher_message';
+            msg.innerHTML = starting_message;
+
+            var anchor = document.querySelector('#anchor');
+            chat_body.insertBefore(msg, anchor);
+        }).catch(error => {
+            console.error('Error:', error)
+        });
+    }
+
+    // Function to display messages and invoke text-to-speech
+    function displayMessages(userMessage, data) {
+        console.log("Server Response:", data);  // Log the entire server response for debugging
+        
+        var chat_body = document.querySelector('#messages');
+        var anchor = document.querySelector('#anchor');
+
+        // Display user message
+        var stud_msg = document.createElement('div');
+        stud_msg.className = 'message student_message';
+        stud_msg.innerHTML = `
+        <div class="message_role">Student</div>
+        <div class="message_content">${userMessage}</div>
+        `;
+        chat_body.insertBefore(stud_msg, anchor);
+
+        // Display teacher's response with corrections and feedback
+        var teacher_msg = document.createElement('div');
+        teacher_msg.className = 'message teacher_message';
+        var formattedMessage = formatResponse(data.new_message);
+
+        if (!formattedMessage || formattedMessage.trim() === '') {
+            console.error("Formatted message is empty. Displaying raw message.");
+            formattedMessage = `<div class="message_content">${data.new_message}</div>`;
+        }
+
+        var new_message = `
+        <div class="message_role">Teacher</div>
+        <div class="message_content">
+            ${formattedMessage}
+        </div>
+        `;
+        var recognize_progress = document.querySelector('#answers_recognize_process');
+        recognize_progress.innerHTML = '';
+        teacher_msg.innerHTML = new_message;
+        chat_body.insertBefore(teacher_msg, anchor);
+
+        anchor.scrollIntoView(true);
+
+        // Invoke speakText() to play the message
+        speakText(data.new_message);
+    }
+
+    // Function to handle text-to-speech
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            var utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'de-DE';  // Set the language to German
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.error('Speech synthesis not supported in this browser.');
+        }
+    }
+
+    // Function to format server responses (existing logic)
+    function formatResponse(response) {
+        let formattedMessage = '';
+
+        // Check for <correct_answer> tag and extract its content if present
+        if (response.includes('<correct_answer>')) {
+            let correctAnswer = extractTagContent(response, 'correct_answer');
+            if (correctAnswer) {
+                formattedMessage += `<div class="correct_answer_text">${correctAnswer}</div>`;
+            }
+        }
+
+        // Check for <grammar> tag and extract its content if present
+        if (response.includes('<grammar>')) {
+            let grammarFeedback = extractTagContent(response, 'grammar');
+            if (grammarFeedback) {
+                formattedMessage += `<div class="grammar_text">${grammarFeedback}</div>`;
+            }
+        }
+
+        // Check for <conversational_partner_answer> tag and extract its content if present
+        if (response.includes('<conversational_partner_answer>')) {
+            let convPartnerAnswer = extractTagContent(response, 'conversational_partner_answer');
+            if (convPartnerAnswer) {
+                formattedMessage += `<div class="conversational_partner_answer_text">${convPartnerAnswer}</div>`;
+            }
+        }
+
+        // If no expected tags are present, display the raw message
+        if (formattedMessage === '') {
+            formattedMessage = `<div class="message_content">${response}</div>`;
+        }
+
+        return formattedMessage;
+    }
+
+    // Extract tag content (existing logic)
+    function extractTagContent(response, tag) {
+        let startTag = `<${tag}>`;
+        let endTag = `</${tag}>`;
+
+        let startIndex = response.indexOf(startTag);
+        let endIndex = response.indexOf(endTag);
+
+        if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
+            return '';  // Return empty if not found
+        }
+
+        let content = response.substring(startIndex + startTag.length, endIndex).replaceAll('\n', '').replaceAll('"', '');
+        return content.trim();
+    }
+</script>
+
+{% endblock %}
