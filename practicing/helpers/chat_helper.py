@@ -13,6 +13,11 @@ client = OpenAI(
 )
 
 def GetStartingMessageEN(situation):
+    """
+    @param: situation - JSON object containing details of the situation seleted.
+    This function creates a thread for every request and provides an id for reference.
+    It returns the thread id and a response.
+    """
 
     assistant_en = client.beta.assistants.retrieve(ASSISTANT_ID_EN)
     thread = client.beta.threads.create()
@@ -75,6 +80,12 @@ def GetStartingMessageEN(situation):
 
 
 def GetTeacherResponseEN(message, conv_id):
+    """
+    @param: message - string data of the user's response.
+    @param: conv_id - string of the thread that was created at the beginning of the session.
+    This function generates a new response for the user's response that was feeded.
+    It returns the answer as a response.
+    """
     print('in GetTeacherResponse message: ', message)
     print('in GetTeacherResponse conv_id: ', conv_id)
 

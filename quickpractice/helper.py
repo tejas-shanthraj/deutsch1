@@ -10,6 +10,10 @@ epi = epitran.Epitran('deu-Latn')
 
 # Practice pronouncing sentences
 def get_sentence( limit=5, offset=0):
+    """
+    Fetch sentences frm the database based on the provided limit and offset values, else use the default values.
+    Creates a list and returns the values.
+    """
 
     data = Sentences.objects.all()[offset:offset + limit]
 
@@ -41,6 +45,10 @@ def get_sentence( limit=5, offset=0):
     }
 
 def get_word(limit=5, offset=0):
+    """
+    Fetch words frm the database based on the provided limit and offset values, else use the default values.
+    Creates a list and returns the values.
+    """
 
     data = Words.objects.all()[offset:offset + limit]
 
@@ -72,6 +80,11 @@ def get_word(limit=5, offset=0):
     }
 
 def check_score(data):
+    """
+    Based on the data type this functions fetches the original IPA and Phoneme from the database,
+    which is then used to compare the correctness between the user's response and original response.
+    Returns a list of error words and correctness percentage.
+    """
     if (data['type'] == "sentence"):
         try:
             db_data = Sentences.objects.filter(id=data['sentence_id']).values('sentence', 'ipa').first()  # Fetching the sentence and IPA from the database
@@ -115,6 +128,10 @@ def check_score(data):
         }
 
 def compare_phonetics(original_phonetic, recorded_phonetic, original_words, recorded_words):
+    """
+    Compares original phonetics and words, contains a logic to calculate the score.
+    Returns correctness percentage and list of errors.
+    """
 
     correct_phonetics = [i for i in original_phonetic.split() for j in recorded_phonetic.split() if i == j]
     incorrect_phonetics = list(set(original_phonetic.split()).difference(recorded_phonetic.split()))
